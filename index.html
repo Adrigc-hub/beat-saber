@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>VR Rhythm Shiver - Boss Fight</title>
+    <title>Beat Saber VR - Shiver Boss Edition</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.3.2/dist/aframe-environment-component.min.js"></script>
 </head>
@@ -10,37 +10,51 @@
 
     <a-scene>
         <a-assets>
-            <audio id="shiver-music" src="https://actions.google.com/sounds/v1/science_fiction/retro_game_loop.mp3" preload="auto"></audio>
+            <audio id="shiver-music" src="https://files.freemusicarchive.org/storage-tokyo/music/ccCommunity/False_Noise/Shiver/False_Noise_-_Shiver.mp3" preload="auto"></audio>
+            
+            <canvas id="arrow-texture" width="128" height="128"></canvas>
         </a-assets>
 
-        <a-entity environment="preset: snowy; skyType: gradient; skyColor: #0b111e; horizonColor: #1b263b; dressing: trees; dressingColor: #2c3e50; dressingAmount: 30; groundColor: #e6effa; grid: none"></a-entity>
+        <a-entity environment="preset: snowy; skyType: gradient; skyColor: #050914; horizonColor: #0f1626; dressing: trees; dressingColor: #121b2d; dressingAmount: 40; groundColor: #0b111e; grid: cross; gridColor: #1f2d4a"></a-entity>
 
-        <a-sphere position="0 25 -80" radius="18" color="#ffffff" material="fog: false; emissive: #ffffff; emissiveIntensity: 0.3"></a-sphere>
+        <a-sky color="#050914"></a-sky>
+        <a-sphere position="0 20 -70" radius="22" color="#e2e8f0" material="emissive: #94a3b8; emissiveIntensity: 0.2; fog: false"></a-sphere>
+        <a-sphere position="6 23 -68" radius="22" color="#050914" material="fog: false"></a-sphere> <a-entity id="boss" position="0 5 -30">
+            <a-box scale="4 4 4" color="#0f172a" material="roughness: 0.2">
+                <a-box scale="1.1 1.1 1.1" color="#ff0055" material="wireframe: true; wireframeLineWidth: 3" animation="property: rotation; to: 360 360 0; loop: true; dur: 8000"></a-box>
+            </a-box>
+            <a-cone id="boss-eye" radius-bottom="1" radius-top="0" rotation="90 0 0" position="0 0 2.5" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 3"></a-cone>
+            <a-octahedron position="-8 2 0" scale="2 4 2" color="#1e293b" material="emissive: #ff0055; emissiveIntensity: 0.2"></a-octahedron>
+            <a-octahedron position="8 2 0" scale="2 4 2" color="#1e293b" material="emissive: #00ffff; emissiveIntensity: 0.2"></a-octahedron>
+        </a-entity>
+
+        <a-entity position="0 0 -15">
+            <a-box position="-3 0 0" scale="0.1 0.1 30" color="#ff0055" id="left-rail" material="emissive: #ff0055; emissiveIntensity: 1"></a-box>
+            <a-box position="3 0 0" scale="0.1 0.1 30" color="#00ffff" id="right-rail" material="emissive: #00ffff; emissiveIntensity: 1"></a-box>
+        </a-entity>
 
         <a-entity id="rig" position="0 0 0">
             <a-entity camera position="0 1.6 0" look-controls></a-entity>
             
-            <a-entity id="leftHand" oculus-touch-controls="hand: left" laser-controls="hand: left" raycaster="objects: .cube; far: 1.5">
-                <a-box position="0 0 -0.4" scale="0.03 0.03 0.8" color="#ff1744" material="emissive: #ff1744; emissiveIntensity: 2"></a-box>
+            <a-entity id="leftHand" oculus-touch-controls="hand: left" laser-controls="hand: left" raycaster="objects: .cube; far: 1.4; showLine: false">
+                <a-cylinder position="0 0 0" rotation="90 0 0" radius="0.02" height="0.15" color="#222"></a-cylinder>
+                <a-box position="0 0 -0.5" scale="0.015 0.015 1" color="#ffffff" material="emissive: #ff0055; emissiveIntensity: 4"></a-box>
+                <a-box position="0 0 -0.5" scale="0.03 0.03 1.02" color="#ff0055" opacity="0.3" material="blending: additive"></a-box>
             </a-entity>
 
-            <a-entity id="rightHand" oculus-touch-controls="hand: right" laser-controls="hand: right" raycaster="objects: .cube; far: 1.5">
-                <a-box position="0 0 -0.4" scale="0.03 0.03 0.8" color="#00e5ff" material="emissive: #00e5ff; emissiveIntensity: 2"></a-box>
+            <a-entity id="rightHand" oculus-touch-controls="hand: right" laser-controls="hand: right" raycaster="objects: .cube; far: 1.4; showLine: false">
+                <a-cylinder position="0 0 0" rotation="90 0 0" radius="0.02" height="0.15" color="#222"></a-cylinder>
+                <a-box position="0 0 -0.5" scale="0.015 0.015 1" color="#ffffff" material="emissive: #00ffff; emissiveIntensity: 4"></a-box>
+                <a-box position="0 0 -0.5" scale="0.03 0.03 1.02" color="#00ffff" opacity="0.3" material="blending: additive"></a-box>
             </a-entity>
-        </a-entity>
-
-        <a-entity id="boss" position="0 4 -25">
-            <a-cone radius-bottom="3" radius-top="0" height="6" color="#0d1b2a" material="wireframe: false"></a-cone>
-            <a-cyanhedron position="0 1 2" scale="0.5 0.5 0.5" color="#00e5ff" animation="property: rotation; to: 0 360 0; loop: true; dur: 2000"></a-cyanhedron>
-            <a-box position="-4 0 0" rotation="0 0 30" scale="4 0.5 0.2" color="#1b263b"></a-box>
-            <a-box position="4 0 0" rotation="0 0 -30" scale="4 0.5 0.2" color="#1b263b"></a-box>
         </a-entity>
 
         <a-entity id="note-container"></a-entity>
 
-        <a-entity id="menu" position="0 1.6 -2" rotation="0 0 0">
-            <a-plane width="2" height="1" color="#111" opacity="0.8">
-                <a-text value="SHIVER: BOSS FIGHT\nOprime Trigger para empezar" align="center" color="#fff" position="0 0 0.1" scale="0.5 0.5 0.5"></a-text>
+        <a-entity id="menu" position="0 1.6 -2.5">
+            <a-plane width="2.5" height="1.2" color="#090d16" opacity="0.9" material="roughness: 1">
+                <a-text value="BEAT SABER: SHIVER BOSS" align="center" color="#00ffff" position="0 0.3 0.1" scale="0.6 0.6 0.6"></a-text>
+                <a-text value="Toca la pantalla o presiona el Trigger\npara iniciar el combate final en VR." align="center" color="#fff" position="0 -0.1 0.1" scale="0.4 0.4 0.4"></a-text>
             </a-plane>
         </a-entity>
     </a-scene>
