@@ -1,102 +1,148 @@
-// Configuración del mapa de ritmo (Tiempo en milisegundos, posición X, posición Y, Color)
-// 0 = Izquierda(Rojo), 1 = Derecha(Azul)
-const bossLevelTrack = [
-    { time: 1000, x: -0.5, y: 1.2, type: 0 },
-    { time: 1800, x: 0.5, y: 1.5, type: 1 },
-    { time: 2500, x: -0.2, y: 1.0, type: 0 },
-    { time: 3200, x: 0.2, y: 1.8, type: 1 },
-    { time: 4000, x: -0.8, y: 1.4, type: 0 },
-    { time: 4500, x: 0.8, y: 1.4, type: 1 },
-    // Agrega aquí tantas notas como quieras siguiendo el ritmo de Shiver
+// Dibuja una flecha blanca sobre fondo transparente para simular el cubo de Beat Saber
+const canvas = document.getElementById('arrow-texture');
+const ctx = canvas.getContext('2d');
+ctx.fillStyle = "rgba(0,0,0,0)";
+ctx.fillRect(0, 0, 128, 128);
+ctx.fillStyle = "#ffffff";
+ctx.beginPath();
+ctx.moveTo(64, 20);
+ctx.lineTo(20, 80);
+ctx.lineTo(50, 80);
+ctx.lineTo(50, 110);
+ctx.lineTo(78, 110);
+ctx.lineTo(78, 80);
+ctx.lineTo(108, 80);
+ctx.closePath();
+ctx.fill();
+
+// MAPA DE RITMO AJUSTADO PARA "SHIVER" (Tiempo en ms, Coordenadas X, Y, Dirección de Flecha, Color/Tipo)
+// Direcciones (rot): 0=Abajo, 180=Arriba, 90=Izquierda, 270=Derecha
+// Type: 0 = Rojo (Mano izq), 1 = Azul (Mano der)
+const shiverTrack = [
+    { time: 1200, x: -0.6, y: 1.2, rot: 0, type: 0 },
+    { time: 2000, x: 0.6, y: 1.2, rot: 0, type: 1 },
+    { time: 2800, x: -0.3, y: 1.5, rot: 180, type: 0 },
+    { time: 3500, x: 0.3, y: 1.5, rot: 180, type: 1 },
+    { time: 4200, x: -0.6, y: 1.0, rot: 90, type: 0 },
+    { time: 4600, x: 0.6, y: 1.0, rot: 270, type: 1 },
+    { time: 5400, x: -0.4, y: 1.6, rot: 0, type: 0 },
+    { time: 5800, x: 0.4, y: 1.6, rot: 0, type: 1 },
+    { time: 6500, x: -0.2, y: 1.2, rot: 270, type: 1 },
+    { time: 6900, x: 0.2, y: 1.2, rot: 90, type: 0 },
+    // Doble golpe rápido sincronizado con el Drop del video
+    { time: 7600, x: -0.5, y: 1.3, rot: 180, type: 0 },
+    { time: 7600, x: 0.5, y: 1.3, rot: 180, type: 1 }
 ];
 
 let gameStarted = false;
 let startTime = 0;
-let noteIndex = 0;
+let trackIndex = 0;
 const container = document.getElementById('note-container');
-const audio = document.getElementById('shiver-music');
+const music = document.getElementById('shiver-music');
 
-// Iniciar juego al presionar cualquier gatillo en el Oculus
-window.addEventListener('keydown', startGame); 
-window.addEventListener('click', startGame);
+// Eventos para iniciar la escena tanto en PC (desarrollo) como en Oculus Quest
+window.addEventListener('click', startBeatSaber);
+window.addEventListener('touchstart', startBeatSaber);
 
-function startGame() {
+function startBeatSaber() {
     if (gameStarted) return;
     gameStarted = true;
-    
-    // Ocultar menú flotante
+
+    // Quitar menú de introducción
     document.getElementById('menu').setAttribute('visible', 'false');
+
+    // Inicializar música
+    music.volume = 0.8;
+    music.play().catch(e => console.log("Interacción requerida para audio:", e));
     
-    // Reproducir música
-    audio.play();
     startTime = performance.now();
-    
-    // Bucle principal del juego
-    animate();
+    animateGame();
 }
 
-function animate() {
+function animateGame() {
     if (!gameStarted) return;
-    
-    let currentTime = performance.now() - startTime;
-    
-    // Revisar si corresponde spawnear el siguiente bloque
-    if (noteIndex < bossLevelTrack.length && currentTime >= bossLevelTrack[noteIndex].time) {
-        spawnCube(bossLevelTrack[noteIndex]);
-        noteIndex++;
+
+    let elapsed = performance.now() - startTime;
+
+    // Spawnear cubos según el tiempo transcurrido de la canción de False Noise
+    if (trackIndex < shiverTrack.length && elapsed >= shiverTrack[trackIndex].time) {
+        createBeatCube(shiverTrack[trackIndex]);
+        trackIndex++;
     }
-    
-    // Mover los bloques activos hacia el jugador (Eje Z)
+
+    // Mapear y desplazar todos los bloques activos hacia la posición del jugador
     let cubes = document.querySelectorAll('.cube');
     cubes.forEach(cube => {
-        let pos = cube.getAttribute('position');
-        pos.z += 0.2; // Velocidad del bloque (Ajustable)
-        cube.setAttribute('position', pos);
-        
-        // Si pasa detrás del jugador, se elimina (Fallo)
-        if (pos.z > 2) {
+        let currentPos = cube.getAttribute('position');
+        currentPos.z += 0.25; // Velocidad de aproximación (Ajustable para cambiar la dificultad)
+        cube.setAttribute('position', currentPos);
+
+        // Si el jugador no corta el bloque y este pasa de largo, se elimina y el Boss reacciona
+        if (currentPos.z > 1.8) {
             cube.parentNode.removeChild(cube);
-            triggerBossAttack(); // Animación de castigo del Jefe
+            bossFlashAttack();
         }
     });
-    
-    requestAnimationFrame(animate);
+
+    requestAnimationFrame(animateGame);
 }
 
-function spawnCube(data) {
-    let cube = document.createElement('a-box');
-    cube.setAttribute('class', 'cube');
-    cube.setAttribute('position', `${data.x} ${data.y} -30`); // Aparecen desde el fondo del Boss
-    cube.setAttribute('scale', '0.3 0.3 0.3');
-    
-    // Definir color según la mano
-    let color = data.type === 0 ? '#ff1744' : '#00e5ff';
-    cube.setAttribute('color', color);
-    cube.setAttribute('material', `emissive: ${color}; emissiveIntensity: 1`);
-    
-    // Detectar corte con los sables (Raycaster de las manos de Oculus)
-    cube.addEventListener('raycaster-intersection', function () {
-        // Efecto visual al destruir
-        cube.parentNode.removeChild(cube);
-        // Aquí puedes sumar puntos a un marcador
+function createBeatCube(data) {
+    // Crear el bloque base contenedor
+    let cubeGroup = document.createElement('a-entity');
+    cubeGroup.setAttribute('class', 'cube');
+    cubeGroup.setAttribute('position', `${data.x} ${data.y} -35`);
+    cubeGroup.setAttribute('rotation', `0 0 ${data.rot}`); // Aplica la dirección de corte
+
+    // Cuerpo interno del cubo (Estilo original de Beat Saber con bordes oscuros)
+    let body = document.createElement('a-box');
+    body.setAttribute('scale', '0.4 0.4 0.4');
+    let colorHex = data.type === 0 ? '#ff0055' : '#00ffff';
+    body.setAttribute('color', colorHex);
+    body.setAttribute('material', `emissive: ${colorHex}; emissiveIntensity: 1.5; roughness: 0.1`);
+
+    // Cara frontal que contiene la flecha blanca de dirección de corte
+    let arrowFace = document.createElement('a-plane');
+    arrowFace.setAttribute('position', '0 0 0.21');
+    arrowFace.setAttribute('scale', '0.3 0.3 0.3');
+    arrowFace.setAttribute('material', 'src: #arrow-texture; transparent: true; shader: flat');
+
+    cubeGroup.appendChild(body);
+    cubeGroup.appendChild(arrowFace);
+
+    // Sistema de Colisión/Corte directo por proximidad de los sables de Oculus
+    cubeGroup.addEventListener('raycaster-intersection', function (evt) {
+        // Validar si el color del sable coincide con el del bloque destruido
+        let handId = evt.detail.el.id;
+        if ((data.type === 0 && handId === 'leftHand') || (data.type === 1 && handId === 'rightHand')) {
+            // Eliminar elemento de la escena simulando el corte exitoso
+            cubeGroup.parentNode.removeChild(cubeGroup);
+            triggerVisualPulse(colorHex);
+        }
     });
 
-    container.appendChild(cube);
+    container.appendChild(cubeGroup);
 }
 
-// Movimiento estético del Boss cuando fallas una nota
-function triggerBossAttack() {
-    const boss = document.getElementById('boss');
-    boss.setAttribute('animation', 'property: position; to: 0 5 -23; dur: 100; dir: alternate; loop: 2');
+// Efecto visual: Los raíles del escenario brillan intensamente al cortar una nota al ritmo de la música
+function triggerVisualPulse(color) {
+    let eye = document.getElementById('boss-eye');
+    eye.setAttribute('material', `emissive: ${color}; emissiveIntensity: 5`);
+    setTimeout(() => {
+        eye.setAttribute('material', 'emissive: #00ffff; emissiveIntensity: 3');
+    }, 150);
 }
 
-// --- MODO EDITOR DE NIVELES MANUAL ---
-// Si estás probando en PC o con teclado y pulsas 'K' (Mano Izq) o 'L' (Mano Der), 
-// imprimirá en la consola del navegador los tiempos exactos para que crees tu propio mapa.
-window.addEventListener('keypress', (e) => {
-    if(gameStarted) {
-        let timestamp = Math.round(performance.now() - startTime);
-        if(e.key === 'k') console.log(`{ time: ${timestamp}, x: -0.5, y: 1.4, type: 0 },`);
-        if(e.key === 'l') console.log(`{ time: ${timestamp}, x: 0.5, y: 1.4, type: 1 },`);
-    }
-});
+// Penalización: El escenario parpadea en rojo si dejas pasar un bloque sin cortarlo
+function bossFlashAttack() {
+    let leftRail = document.getElementById('left-rail');
+    let rightRail = document.getElementById('right-rail');
+    
+    leftRail.setAttribute('color', '#ffffff');
+    rightRail.setAttribute('color', '#ffffff');
+    
+    setTimeout(() => {
+        leftRail.setAttribute('color', '#ff0055');
+        rightRail.setAttribute('color', '#00ffff');
+    }, 200);
+}
