@@ -1,148 +1,170 @@
-// Dibuja una flecha blanca sobre fondo transparente para simular el cubo de Beat Saber
+// Inicializar textura de flecha para bloques
 const canvas = document.getElementById('arrow-texture');
 const ctx = canvas.getContext('2d');
-ctx.fillStyle = "rgba(0,0,0,0)";
-ctx.fillRect(0, 0, 128, 128);
-ctx.fillStyle = "#ffffff";
-ctx.beginPath();
-ctx.moveTo(64, 20);
-ctx.lineTo(20, 80);
-ctx.lineTo(50, 80);
-ctx.lineTo(50, 110);
-ctx.lineTo(78, 110);
-ctx.lineTo(78, 80);
-ctx.lineTo(108, 80);
-ctx.closePath();
-ctx.fill();
+ctx.fillStyle = "rgba(0,0,0,0)"; ctx.fillRect(0, 0, 128, 128);
+ctx.fillStyle = "#ffffff"; ctx.beginPath();
+ctx.moveTo(64, 15); ctx.lineTo(15, 85); ctx.lineTo(48, 85); ctx.lineTo(48, 115);
+ctx.lineTo(80, 115); ctx.lineTo(80, 85); ctx.lineTo(113, 85); ctx.closePath(); ctx.fill();
 
-// MAPA DE RITMO AJUSTADO PARA "SHIVER" (Tiempo en ms, Coordenadas X, Y, Dirección de Flecha, Color/Tipo)
-// Direcciones (rot): 0=Abajo, 180=Arriba, 90=Izquierda, 270=Derecha
-// Type: 0 = Rojo (Mano izq), 1 = Azul (Mano der)
-const shiverTrack = [
-    { time: 1200, x: -0.6, y: 1.2, rot: 0, type: 0 },
-    { time: 2000, x: 0.6, y: 1.2, rot: 0, type: 1 },
-    { time: 2800, x: -0.3, y: 1.5, rot: 180, type: 0 },
-    { time: 3500, x: 0.3, y: 1.5, rot: 180, type: 1 },
-    { time: 4200, x: -0.6, y: 1.0, rot: 90, type: 0 },
-    { time: 4600, x: 0.6, y: 1.0, rot: 270, type: 1 },
-    { time: 5400, x: -0.4, y: 1.6, rot: 0, type: 0 },
-    { time: 5800, x: 0.4, y: 1.6, rot: 0, type: 1 },
-    { time: 6500, x: -0.2, y: 1.2, rot: 270, type: 1 },
-    { time: 6900, x: 0.2, y: 1.2, rot: 90, type: 0 },
-    // Doble golpe rápido sincronizado con el Drop del video
-    { time: 7600, x: -0.5, y: 1.3, rot: 180, type: 0 },
-    { time: 7600, x: 0.5, y: 1.3, rot: 180, type: 1 }
-];
+// --- MAPAS DE RITMO ULTRA RÁPIDOS (HARDCORE) ---
+// Estructura densa para imitar los movimientos frenéticos de sables cruzados del video 1.
+const levels = {
+    1: {
+        audioId: 'track-shiver',
+        decorId: 'decor-shiver',
+        envPreset: 'snowy',
+        speed: 0.65, // Velocidad extrema por frame
+        tracks: [
+            { time: 800, x: -0.4, y: 1.1, rot: 0, type: 0 },
+            { time: 1100, x: 0.4, y: 1.1, rot: 0, type: 1 },
+            { time: 1400, x: -0.4, y: 1.5, rot: 180, type: 0 },
+            { time: 1700, x: 0.4, y: 1.5, rot: 180, type: 1 },
+            { time: 2000, x: -0.6, y: 1.3, rot: 90, type: 0 },
+            { time: 2200, x: 0.6, y: 1.3, rot: 270, type: 1 },
+            { time: 2400, x: -0.2, y: 1.6, rot: 180, type: 0 },
+            { time: 2600, x: 0.2, y: 1.0, rot: 0, type: 1 },
+            // Ráfaga cruzada rápida (Stream)
+            { time: 3000, x: -0.5, y: 1.2, rot: 0, type: 0 },
+            { time: 3150, x: 0.5, y: 1.4, rot: 180, type: 1 },
+            { time: 3300, x: -0.3, y: 1.5, rot: 180, type: 0 },
+            { time: 3450, x: 0.3, y: 1.1, rot: 0, type: 1 },
+            { time: 3800, x: -0.6, y: 1.0, rot: 270, type: 0 },
+            { time: 3800, x: 0.6, y: 1.0, rot: 90, type: 1 }
+        ]
+    },
+    2: {
+        audioId: 'track-something',
+        decorId: 'decor-something',
+        envPreset: 'goldrush',
+        speed: 0.85, // Modo Dios - Bloques casi instantáneos
+        tracks: [
+            { time: 500, x: -0.3, y: 1.4, rot: 180, type: 0 },
+            { time: 700, x: 0.3, y: 1.4, rot: 180, type: 1 },
+            { time: 1000, x: -0.6, y: 1.0, rot: 90, type: 0 },
+            { time: 1200, x: 0.6, y: 1.6, rot: 90, type: 1 },
+            { time: 1500, x: -0.2, y: 1.5, rot: 0, type: 1 }, 
+            { time: 1700, x: 0.2, y: 1.1, rot: 180, type: 0 },
+            // Patrón saltarín síncopado del video 3
+            { time: 2200, x: -0.5, y: 1.6, rot: 45, type: 0 },
+            { time: 2350, x: 0.5, y: 1.0, rot: 225, type: 1 },
+            { time: 2500, x: -0.5, y: 1.0, rot: 135, type: 0 },
+            { time: 2650, x: 0.5, y: 1.6, rot: 315, type: 1 },
+            { time: 3100, x: -0.3, y: 1.3, rot: 0, type: 0 },
+            { time: 3100, x: 0.3, y: 1.3, rot: 0, type: 1 }
+        ]
+    }
+};
 
+let activeLevel = null;
 let gameStarted = false;
 let startTime = 0;
 let trackIndex = 0;
+let activeCubes = [];
+
 const container = document.getElementById('note-container');
-const music = document.getElementById('shiver-music');
+const hitSound = document.getElementById('hit-sound');
 
-// Eventos para iniciar la escena tanto en PC (desarrollo) como en Oculus Quest
-window.addEventListener('click', startBeatSaber);
-window.addEventListener('touchstart', startBeatSaber);
+// Soportar clics en PC y selección mediante Raycaster/Gatillo en Oculus Quest
+document.getElementById('btn-lvl1').addEventListener('click', () => launchLevel(1));
+document.getElementById('btn-lvl2').addEventListener('click', () => launchLevel(2));
 
-function startBeatSaber() {
+function launchLevel(lvlId) {
     if (gameStarted) return;
+    activeLevel = levels[lvlId];
     gameStarted = true;
 
-    // Quitar menú de introducción
-    document.getElementById('menu').setAttribute('visible', 'false');
+    // Ajustar interfaces y entornos
+    document.getElementById('main-menu').setAttribute('visible', 'false');
+    document.getElementById(activeLevel.decorId).setAttribute('visible', 'true');
+    if(lvlId === 2) {
+        document.getElementById('rail-l').setAttribute('color', '#78350f');
+        document.getElementById('rail-r').setAttribute('color', '#ca8a04');
+    }
 
-    // Inicializar música
-    music.volume = 0.8;
-    music.play().catch(e => console.log("Interacción requerida para audio:", e));
+    // Arrancar música y bucle
+    const music = document.getElementById(activeLevel.audioId);
+    music.volume = 0.9;
+    music.play();
     
     startTime = performance.now();
-    animateGame();
+    runEngine();
 }
 
-function animateGame() {
+function runEngine() {
     if (!gameStarted) return;
-
     let elapsed = performance.now() - startTime;
 
-    // Spawnear cubos según el tiempo transcurrido de la canción de False Noise
-    if (trackIndex < shiverTrack.length && elapsed >= shiverTrack[trackIndex].time) {
-        createBeatCube(shiverTrack[trackIndex]);
+    // Generar nuevos bloques basados en el tiempo exacto
+    if (trackIndex < activeLevel.tracks.length && elapsed >= activeLevel.tracks[trackIndex].time) {
+        spawnCube(activeLevel.tracks[trackIndex]);
         trackIndex++;
     }
 
-    // Mapear y desplazar todos los bloques activos hacia la posición del jugador
-    let cubes = document.querySelectorAll('.cube');
-    cubes.forEach(cube => {
-        let currentPos = cube.getAttribute('position');
-        currentPos.z += 0.25; // Velocidad de aproximación (Ajustable para cambiar la dificultad)
-        cube.setAttribute('position', currentPos);
+    // Obtener posiciones actuales de los sables en el espacio 3D de las Quest
+    let leftSaberPos = new THREE.Vector3();
+    let rightSaberPos = new THREE.Vector3();
+    document.getElementById('leftHand').object3D.getWorldPosition(leftSaberPos);
+    document.getElementById('rightHand').object3D.getWorldPosition(rightSaberPos);
 
-        // Si el jugador no corta el bloque y este pasa de largo, se elimina y el Boss reacciona
-        if (currentPos.z > 1.8) {
-            cube.parentNode.removeChild(cube);
-            bossFlashAttack();
+    // Mover cubos de manera lineal súper veloz y calcular colisiones directas por distancia
+    for (let i = activeCubes.length - 1; i >= 0; i--) {
+        let item = activeCubes[i];
+        if (!item.el.parentNode) { activeCubes.splice(i, 1); continue; }
+
+        let currentPos = item.el.getAttribute('position');
+        currentPos.z += activeLevel.speed; // Movimiento por cuadro de actualización
+        item.el.setAttribute('position', currentPos);
+
+        // VECTOR FÍSICO 3D DEL BLOQUE ACTUAL
+        let cubeWorldPos = new THREE.Vector3(currentPos.x, currentPos.y, currentPos.z);
+
+        // DISTANCIA MATEMÁTICA EXACTA (Solución definitiva para alta velocidad)
+        let distLeft = leftSaberPos.distanceTo(cubeWorldPos);
+        let distRight = rightSaberPos.distanceTo(cubeWorldPos);
+
+        // Rango de acierto estricto (0.65 metros a la redonda del sable)
+        if ((item.type === 0 && distLeft < 0.65) || (item.type === 1 && distRight < 0.65)) {
+            // Reproducir sonido de impacto del sable real de manera asíncrona inmediata
+            hitSound.currentTime = 0;
+            hitSound.play();
+            
+            item.el.parentNode.removeChild(item.el);
+            activeCubes.splice(i, 1);
+            continue;
         }
-    });
 
-    requestAnimationFrame(animateGame);
+        // Si sobrepasa la línea del cuerpo del jugador, desaparece
+        if (currentPos.z > 1.5) {
+            item.el.parentNode.removeChild(item.el);
+            activeCubes.splice(i, 1);
+        }
+    }
+
+    requestAnimationFrame(runEngine);
 }
 
-function createBeatCube(data) {
-    // Crear el bloque base contenedor
+function spawnCube(data) {
     let cubeGroup = document.createElement('a-entity');
-    cubeGroup.setAttribute('class', 'cube');
-    cubeGroup.setAttribute('position', `${data.x} ${data.y} -35`);
-    cubeGroup.setAttribute('rotation', `0 0 ${data.rot}`); // Aplica la dirección de corte
+    cubeGroup.setAttribute('position', `${data.x} ${data.y} -40`); // Aparecen a lo lejos en el túnel
+    cubeGroup.setAttribute('rotation', `0 0 ${data.rot}`);
 
-    // Cuerpo interno del cubo (Estilo original de Beat Saber con bordes oscuros)
     let body = document.createElement('a-box');
-    body.setAttribute('scale', '0.4 0.4 0.4');
-    let colorHex = data.type === 0 ? '#ff0055' : '#00ffff';
+    body.setAttribute('scale', '0.42 0.42 0.42');
+    
+    // Asignar colores según el nivel (Rojo/Azul clásicos para Nivel 1, Marrón/Oro para Nivel 2)
+    let colorHex = data.type === 0 ? (activeLevel === levels[1] ? '#ff0055' : '#78350f') : (activeLevel === levels[1] ? '#00ffff' : '#facc15');
     body.setAttribute('color', colorHex);
-    body.setAttribute('material', `emissive: ${colorHex}; emissiveIntensity: 1.5; roughness: 0.1`);
+    body.setAttribute('material', `emissive: ${colorHex}; emissiveIntensity: 2.2; roughness: 0`);
 
-    // Cara frontal que contiene la flecha blanca de dirección de corte
     let arrowFace = document.createElement('a-plane');
-    arrowFace.setAttribute('position', '0 0 0.21');
-    arrowFace.setAttribute('scale', '0.3 0.3 0.3');
+    arrowFace.setAttribute('position', '0 0 0.22');
+    arrowFace.setAttribute('scale', '0.32 0.32 0.32');
     arrowFace.setAttribute('material', 'src: #arrow-texture; transparent: true; shader: flat');
 
     cubeGroup.appendChild(body);
     cubeGroup.appendChild(arrowFace);
-
-    // Sistema de Colisión/Corte directo por proximidad de los sables de Oculus
-    cubeGroup.addEventListener('raycaster-intersection', function (evt) {
-        // Validar si el color del sable coincide con el del bloque destruido
-        let handId = evt.detail.el.id;
-        if ((data.type === 0 && handId === 'leftHand') || (data.type === 1 && handId === 'rightHand')) {
-            // Eliminar elemento de la escena simulando el corte exitoso
-            cubeGroup.parentNode.removeChild(cubeGroup);
-            triggerVisualPulse(colorHex);
-        }
-    });
-
     container.appendChild(cubeGroup);
-}
 
-// Efecto visual: Los raíles del escenario brillan intensamente al cortar una nota al ritmo de la música
-function triggerVisualPulse(color) {
-    let eye = document.getElementById('boss-eye');
-    eye.setAttribute('material', `emissive: ${color}; emissiveIntensity: 5`);
-    setTimeout(() => {
-        eye.setAttribute('material', 'emissive: #00ffff; emissiveIntensity: 3');
-    }, 150);
-}
-
-// Penalización: El escenario parpadea en rojo si dejas pasar un bloque sin cortarlo
-function bossFlashAttack() {
-    let leftRail = document.getElementById('left-rail');
-    let rightRail = document.getElementById('right-rail');
-    
-    leftRail.setAttribute('color', '#ffffff');
-    rightRail.setAttribute('color', '#ffffff');
-    
-    setTimeout(() => {
-        leftRail.setAttribute('color', '#ff0055');
-        rightRail.setAttribute('color', '#00ffff');
-    }, 200);
+    // Guardar referencia en el motor de colisiones de alta frecuencia
+    activeCubes.push({ el: cubeGroup, type: data.type });
 }
