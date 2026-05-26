@@ -2,11 +2,32 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Beat Saber VR & Mobile Magic Canvas</title>
+    <title>VR & Mobile Selector Perfect Fix</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.3.2/dist/aframe-environment-component.min.js"></script>
+    <style>
+        /* Botón flotante para forzar el cambio de plataforma en celular */
+        #device-selector {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 99999;
+            background: rgba(14, 5, 20, 0.9);
+            color: #00ffff;
+            border: 2px solid #bc00ff;
+            padding: 12px 20px;
+            font-family: sans-serif;
+            font-weight: bold;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 0 10px #bc00ff;
+        }
+    </style>
 </head>
 <body>
+
+    <button id="device-selector" onclick="toggleDeviceMode()">MODO ACTUAL: CELULAR TÁCTIL</button>
 
     <a-scene xr-mode-ui="enabled: true" id="scene">
         
@@ -25,20 +46,18 @@
         <a-entity id="decorations">
             <a-torus color="#ff0055" radius="5" tube="0.08" position="0 2.5 -12" material="emissive: #ff0055; emissiveIntensity: 3"></a-torus>
             <a-torus color="#00ffff" radius="5" tube="0.08" position="0 2.5 -24" material="emissive: #00ffff; emissiveIntensity: 3"></a-torus>
-            <a-box position="-6 5 -15" scale="0.8 12 0.8" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 2"></a-box>
-            <a-box position="6 5 -15" scale="0.8 12 0.8" color="#ff0055" material="emissive: #ff0055; emissiveIntensity: 2"></a-box>
         </a-entity>
 
         <a-entity id="rig" position="0 0 0">
-            <a-camera id="head" position="0 1.6 0" look-controls="enabled: true">
-                <a-cursor id="mouse-fallback" raycaster="objects: .menu-btn, .cube, .draw-zone; far: 40" material="color: #ffffff; shader: flat" position="0 0 -1"></a-cursor>
+            <a-camera id="head" position="0 1.6 0" look-controls="enabled: false">
+                <a-cursor id="mouse-fallback" raycaster="objects: .menu-btn, .cube, .draw-zone; far: 50" material="color: #ffffff; shader: flat" position="0 0 -1"></a-cursor>
             </a-camera>
             
-            <a-entity id="left-hand" laser-controls="hand: left" raycaster="objects: .cube, .wall, .draw-zone; far: 5; interval: 30">
+            <a-entity id="left-hand" laser-controls="hand: left" raycaster="objects: .cube, .wall, .draw-zone; far: 5; interval: 30" visible="false">
                 <a-cylinder id="saber-blade-left" color="#ff0000" radius="0.018" height="1.2" position="0 0 -0.6" rotation="90 0 0" material="emissive: #ff0000; emissiveIntensity: 4"></a-cylinder>
             </a-entity>
             
-            <a-entity id="right-hand" laser-controls="hand: right" raycaster="objects: .menu-btn, .cube, .wall, .draw-zone; far: 15; interval: 30">
+            <a-entity id="right-hand" laser-controls="hand: right" raycaster="objects: .menu-btn, .cube, .wall, .draw-zone; far: 20; interval: 30">
                 <a-cylinder id="saber-blade-right" color="#0088ff" radius="0.018" height="1.2" position="0 0 -0.6" rotation="90 0 0" material="emissive: #0088ff; emissiveIntensity: 4"></a-cylinder>
             </a-entity>
         </a-entity>
@@ -55,8 +74,8 @@
                 <a-text id="npc-hp-text" value="HP: 100/100" align="center" position="0 1.4 0" width="4" color="#ff3333"></a-text>
             </a-entity>
 
-            <a-text id="draw-instruction" value="DIBUJA UN TRIANGULO" align="center" position="0 0.2 0" width="4" color="#00ffff"></a-text>
-            <a-plane id="canvas-trigger" class="draw-zone" color="#222" opacity="0.1" width="2" height="1.5" position="0 -0.5 0"></a-plane>
+            <a-text id="draw-instruction" value="DIBUJA UN TRIANGULO" align="center" position="0 0.4 0" width="4" color="#00ffff"></a-text>
+            <a-plane id="canvas-trigger" class="draw-zone" color="#222" opacity="0.1" width="2.5" height="1.8" position="0 -0.4 0"></a-plane>
             <a-entity id="drawn-lines-container"></a-entity>
         </a-entity>
 
@@ -81,13 +100,13 @@
                 
                 <a-entity id="btn-back-blocks" class="menu-btn" geometry="primitive: plane; width: 0.4; height: 0.2" material="color: #bc00ff" position="-1.1 0.8 0.04" text="value: <-; align: center; color: #fff; width: 4"></a-entity>
 
-                <a-entity class="menu-btn" data-magic-level="1" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #221035" position="0 0.45 0.03" text="value: M1. Hechizo de Fuego (Facil); align: center; width: 3.2"></a-entity>
-                <a-entity class="menu-btn" data-magic-level="2" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #221035" position="0 0.25 0.03" text="value: M2. Runa de Rayo (Medio); align: center; width: 3.2"></a-entity>
+                <a-entity class="menu-btn" data-magic-level="1" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #221035" position="0 0.45 0.03" text="value: M1. Hechizo de Fuego; align: center; width: 3.2"></a-entity>
+                <a-entity class="menu-btn" data-magic-level="2" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #221035" position="0 0.25 0.03" text="value: M2. Runa de Rayo; align: center; width: 3.2"></a-entity>
                 <a-entity class="menu-btn" data-magic-level="3" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #221035" position="0 0.05 0.03" text="value: M3. Escudo de Hielo; align: center; width: 3.2"></a-entity>
                 <a-entity class="menu-btn" data-magic-level="4" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #221035" position="0 -0.15 0.03" text="value: M4. Vortice Oscuro; align: center; width: 3.2"></a-entity>
                 <a-entity class="menu-btn" data-magic-level="5" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #221035" position="0 -0.35 0.03" text="value: M5. Invocacion ancestral; align: center; width: 3.2"></a-entity>
                 <a-entity class="menu-btn" data-magic-level="6" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #350520" position="0 -0.55 0.03" text="value: M6. Alquimia Prohibida; align: center; width: 3.2; color: #ff00ff"></a-entity>
-                <a-entity class="menu-btn" data-magic-level="7" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #550000" position="0 -0.75 0.03" text="value: M7. SUPREMO INFERNAL (BOSS FIGHT); align: center; width: 3.2; color: #ff3333"></a-entity>
+                <a-entity class="menu-btn" data-magic-level="7" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #550000" position="0 -0.75 0.03" text="value: M7. SUPREMO INFERNAL (BOSS); align: center; width: 3.2; color: #ff3333"></a-entity>
             </a-entity>
 
             <a-entity id="panel-difficulty" position="0 0 0" visible="false">
@@ -116,18 +135,17 @@
         let gameActive = false;
         let magicModeActive = false;
         let isDrawing = false;
+        let isVRMode = false; // Control de plataforma estricto
         let lastSpawnTime = 0;
         let currentAudio = null;
         let activeCubes = [];
         let activeWalls = [];
         let currentLevelConfig = {};
 
-        // Variables de Magia
         let enemyHP = 100;
         let maxEnemyHP = 100;
         let currentMagicLevel = 1;
         let drawnPoints = [];
-        let canvasBoundingBox = null;
 
         const levelsData = {
             1: { audio: 'music-easy', baseSpeed: 6, baseSpawnRate: 1600, env: 'night', color: '#00ffff' },
@@ -139,7 +157,31 @@
 
         const shapesList = ["LINEA", "TRIANGULO", "CUADRADO", "CIRCULO", "ZIGZAG", "ESTRELLA", "RUNA SUPREMA"];
 
-        // CONTROLADORES DE TRÁFICO ENTRE MENÚS
+        // CONTROLADOR DE DISPOSITIVO (Fija comportamiento táctil vs Mandos de cascos)
+        function toggleDeviceMode() {
+            isVRMode = !isVRMode;
+            const btn = document.getElementById('device-selector');
+            const leftHand = document.getElementById('left-hand');
+            const cam = document.getElementById('head');
+
+            if (isVRMode) {
+                btn.innerText = "MODO ACTUAL: REALIDAD VIRTUAL (VR)";
+                btn.style.color = "#ff0055";
+                btn.style.borderColor = "#ff0055";
+                leftHand.setAttribute('visible', 'true');
+                cam.setAttribute('look-controls', 'enabled: true'); // Activa giroscopio solo en cascos VR
+            } else {
+                btn.innerText = "MODO ACTUAL: CELULAR TÁCTIL";
+                btn.style.color = "#00ffff";
+                btn.style.borderColor = "#bc00ff";
+                leftHand.setAttribute('visible', 'false');
+                cam.setAttribute('look-controls', 'enabled: false'); // Congela la cámara en celular para evitar desvíos al tocar
+                cam.setAttribute('rotation', '0 0 0');
+                document.getElementById('right-hand').setAttribute('position', '0 1.5 -1');
+            }
+        }
+
+        // CONTROL DE MENÚS (FLECHAS TRASLACIÓN)
         document.getElementById('btn-go-magic').addEventListener('click', function() {
             document.getElementById('menu-blocks').setAttribute('visible', 'false');
             document.getElementById('menu-blocks').setAttribute('position', '0 0 -50');
@@ -156,7 +198,6 @@
             mb.setAttribute('position', '0 0 0');
         });
 
-        // Seleccionar nivel de bloques
         document.querySelectorAll('[data-sel-level]').forEach(btn => {
             btn.addEventListener('click', function() {
                 selectedLevelId = this.getAttribute('data-sel-level');
@@ -178,7 +219,6 @@
             });
         });
 
-        // SELECCIONAR NIVEL DE MAGIA (MODO CELULAR / VR CANVAS)
         document.querySelectorAll('[data-magic-level]').forEach(btn => {
             btn.addEventListener('click', function() {
                 currentMagicLevel = parseInt(this.getAttribute('data-magic-level'));
@@ -186,18 +226,20 @@
             });
         });
 
-        // MOBILE CONTROL COMPLEMENT: Hacer que los sables sigan el cursor/dedo automáticamente si se juega en pantalla táctil
-        window.addEventListener('mousemove', handlePointerMove);
-        window.addEventListener('touchmove', function(e) {
-            if(e.touches.length > 0) handlePointerMove(e.touches[0]);
+        // MANIPULADOR TÁCTIL EXCLUSIVO PARA CELULAR (Sable sigue tu dedo al deslizar por la pantalla)
+        const sceneEl = document.getElementById('scene');
+        
+        sceneEl.addEventListener('mousemove', processPointerInput);
+        sceneEl.addEventListener('touchmove', function(e) {
+            if(e.touches.length > 0) processPointerInput(e.touches[0]);
         });
 
-        function handlePointerMove(e) {
-            if (gameActive && !magicModeActive) {
-                // Mapear posición de mouse/dedo para mover las hojas de luz al frente si no hay casco VR
-                const x = (e.clientX / window.innerWidth) * 3 - 1.5;
-                const y = -(e.clientY / window.innerHeight) * 2 + 2.3;
-                document.getElementById('right-hand').setAttribute('position', `${x} ${y} -1`);
+        function processPointerInput(e) {
+            if (gameActive && !magicModeActive && !isVRMode) {
+                // Mapeo adaptado para que el sable derecho cubra toda la cuadrícula en pantallas de móvil
+                const x = ((e.clientX / window.innerWidth) * 3.2) - 1.6;
+                const y = -((e.clientY / window.innerHeight) * 2.4) + 2.6;
+                document.getElementById('right-hand').setAttribute('position', `${x} ${y} -1.2`);
             }
         }
 
@@ -226,12 +268,11 @@
             magicModeActive = true;
             gameActive = true;
             
-            // Configurar vida de enemigo y Boss final (Nivel 7)
             if(currentMagicLevel === 7) {
-                maxEnemyHP = 400;
-                document.getElementById('npc-mesh').setAttribute('geometry', 'primitive: torusKnot; radius: 0.5; tube: 0.15');
-                document.getElementById('npc-mesh').setAttribute('material', 'color: #ff0000; emissive: #440000');
-                document.getElementById('draw-instruction').setAttribute('text', 'value: !!! BOSS FIGHT: RUNA INFERNAL !!!; color: #ff2222; align: center');
+                maxEnemyHP = 500;
+                document.getElementById('npc-mesh').setAttribute('geometry', 'primitive: torusKnot; radius: 0.45; tube: 0.12');
+                document.getElementById('npc-mesh').setAttribute('material', 'color: #ff1111; emissive: #550000');
+                document.getElementById('draw-instruction').setAttribute('text', 'value: !!! BOSS FIGHT: RUNA SUPREMA !!!; color: #ff3333; align: center');
             } else {
                 maxEnemyHP = 100 + (currentMagicLevel * 20);
                 document.getElementById('npc-mesh').setAttribute('geometry', 'primitive: cone; radiusBottom: 0.4; height: 1.2');
@@ -247,15 +288,14 @@
             drawnPoints = [];
         }
 
-        // CAPTURA DE DIBUJO CON INTERFAZ TÁCTIL (Móvil) O MANDO VR (Trigger de arriba / Grip superior)
+        // CAPTURA INTERACTIVA DEL DIBUJO (Funciona con clics/toques en celular y botones en VR)
         const canvasEl = document.getElementById('canvas-trigger');
         
         canvasEl.addEventListener('mousedown', startDrawing);
         canvasEl.addEventListener('touchstart', startDrawing);
         window.addEventListener('mouseup', stopDrawing);
         window.addEventListener('touchend', stopDrawing);
-
-        // Soporte nativo para botones superiores de mandos de Realidad Virtual (Trigger/Grip)
+        
         document.getElementById('right-hand').addEventListener('triggerdown', startDrawing);
         document.getElementById('right-hand').addEventListener('triggerup', stopDrawing);
 
@@ -270,46 +310,45 @@
             if (!isDrawing || !magicModeActive) return;
             isDrawing = false;
             
-            // Procesar calidad del dibujo mágico realizado
-            if (drawnPoints.length > 2) {
-                let damage = Math.floor(Math.random() * 25) + 15; // Daño base basado en el trazo libre
+            if (drawnPoints.length > 1) {
+                let damage = Math.floor(Math.random() * 26) + 20; 
                 enemyHP = Math.max(0, enemyHP - damage);
                 updateNPCUI();
 
                 if (enemyHP <= 0) {
-                    alert(currentMagicLevel === 7 ? "¡¡¡HAS DERROTADO AL JEFE SUPREMO INTERNAL!!!" : "¡Enemigo Derrotado con tu magia!");
+                    alert(currentMagicLevel === 7 ? "¡¡¡FELICIDADES! ¡HAS ANIQUILADO AL BOSS FINAL DEL JUEGO!!!" : "¡Enemigo abatido por tu runa!");
                     returnToMenu();
                 }
             }
         }
 
-        // Registrar puntos en el plano flotante
-        canvasEl.addEventListener('mouseenter', function(e) {
+        // Captura el arrastre en el plano flotante
+        canvasEl.addEventListener('mouseenter', function() {
             if(!isDrawing || !magicModeActive) return;
             
-            // Obtener el punto de intersección tridimensional del Raycaster (sirve tanto para VR como clic móvil)
-            const intersection = document.getElementById('mouse-fallback').components.raycaster.getIntersection(canvasEl);
+            const raycasterComp = document.getElementById('mouse-fallback').components.raycaster;
+            const intersection = raycasterComp.getIntersection(canvasEl);
+            
             if(intersection) {
                 const pt = intersection.point;
                 drawnPoints.push(pt);
                 
-                // Pintar la línea mágica morada en la pantalla
                 const dot = document.createElement('a-sphere');
-                dot.setAttribute('radius', '0.02');
-                dot.setAttribute('color', '#bc00ff');
+                dot.setAttribute('radius', '0.025');
+                dot.setAttribute('color', '#ff00ff');
                 dot.setAttribute('material', 'emissive: #ff00ff; emissiveIntensity: 2');
-                dot.setAttribute('position', `${pt.x} ${pt.y} ${pt.z + 0.02}`);
+                dot.setAttribute('position', `${pt.x} ${pt.y} ${pt.z + 0.01}`);
                 document.getElementById('drawn-lines-container').appendChild(dot);
             }
         });
 
         function spawnCube() {
             const container = document.getElementById('gameplay-container');
-            if (Math.random() > 0.85) { spawnWall(); return; }
+            if (Math.random() > 0.86) { spawnWall(); return; }
 
             const cube = document.createElement('a-entity');
             const posX = (Math.random() * 1.6) - 0.8; 
-            const posY = (Math.random() * 1.1) + 0.7; 
+            const posY = (Math.random() * 1.0) + 0.8; 
             const posZ = -35;
 
             const isRed = Math.random() > 0.5;
@@ -317,7 +356,7 @@
 
             cube.setAttribute('class', 'cube');
             cube.setAttribute('geometry', 'primitive: box; width: 0.36; height: 0.36; depth: 0.36');
-            cube.setAttribute('material', `color: ${cubeColor}; emissive: ${cubeColor}; emissiveIntensity: 2`);
+            cube.setAttribute('material', `color: ${cubeColor}; emissive: ${cubeColor}; emissiveIntensity: 1.8`);
             cube.setAttribute('position', `${posX} ${posY} ${posZ}`);
 
             const arrow = document.createElement('a-cone');
@@ -339,18 +378,17 @@
         function spawnWall() {
             const container = document.getElementById('gameplay-container');
             const wall = document.createElement('a-box');
-            const posX = Math.random() > 0.5 ? -0.9 : 0.9;
+            const posX = Math.random() > 0.5 ? -0.95 : 0.95;
 
             wall.setAttribute('class', 'wall');
             wall.setAttribute('position', `${posX} 2 -35`);
-            wall.setAttribute('scale', '1.2 3.5 0.5'); 
+            wall.setAttribute('scale', '1.1 3.5 0.5'); 
             wall.setAttribute('material', 'color: #ff0022; opacity: 0.5; transparent: true; emissive: #ff0022');
 
             container.appendChild(wall);
             activeWalls.push(wall);
         }
 
-        // FRAME LOOP (DELTA TIME PERFECTO)
         let lastFrameTime = performance.now();
 
         function gameLoop() {
@@ -368,7 +406,6 @@
                 lastSpawnTime = now;
             }
 
-            // Detección de golpes usando Raycasters (VR/Móvil por igual)
             const leftRaycaster = document.getElementById('left-hand').components.raycaster;
             const rightRaycaster = document.getElementById('right-hand').components.raycaster;
             const fallbackRaycaster = document.getElementById('mouse-fallback').components.raycaster;
@@ -382,8 +419,8 @@
                 pos.z += currentLevelConfig.finalSpeed * deltaTime;
                 cube.setAttribute('position', pos);
 
-                let hitLeft = leftRaycaster && leftRaycaster.intersectedEls.includes(cube);
-                let hitRight = rightRaycaster && rightRaycaster.intersectedEls.includes(cube);
+                let hitLeft = isVRMode && leftRaycaster && leftRaycaster.intersectedEls.includes(cube);
+                let hitRight = isVRMode && rightRaycaster && rightRaycaster.intersectedEls.includes(cube);
                 let hitTouch = fallbackRaycaster && fallbackRaycaster.intersectedEls.includes(cube);
 
                 if (hitLeft || hitRight || hitTouch) {
@@ -400,7 +437,6 @@
                 }
             }
 
-            // Mover paredes
             for (let j = activeWalls.length - 1; j >= 0; j--) {
                 const wall = activeWalls[j];
                 if (!wall || !wall.parentNode) continue;
@@ -452,7 +488,6 @@
             activeCubes = [];
             activeWalls = [];
 
-            // Regresar menú
             const menu = document.getElementById('main-menu');
             menu.setAttribute('visible', 'true');
             menu.setAttribute('position', '0 1.6 -2.2');
