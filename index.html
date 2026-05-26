@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Beat Saber VR - Hardcore Custom Edition</title>
+    <title>Beat Saber VR - Hardcore Slasher</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.3.2/dist/aframe-environment-component.min.js"></script>
 </head>
@@ -10,10 +10,6 @@
 
     <a-scene id="game-scene">
         <a-assets>
-            <audio id="track-shiver" src="https://files.freemusicarchive.org/storage-tokyo/music/ccCommunity/False_Noise/Shiver/False_Noise_-_Shiver.mp3" preload="auto" crossorigin="anonymous"></audio>
-            <audio id="track-something" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto" crossorigin="anonymous"></audio>
-            <audio id="hit-sound" src="https://actions.google.com/sounds/v1/foley/laser_burst.mp3" preload="auto" crossorigin="anonymous"></audio>
-            
             <canvas id="arrow-texture" width="128" height="128"></canvas>
         </a-assets>
 
@@ -23,38 +19,45 @@
         <a-entity id="env" environment="preset: starry; skyType: gradient; skyColor: #020205; horizonColor: #050510; grid: cross; gridColor: #111a2e"></a-entity>
 
         <a-entity id="decor-shiver" visible="false">
-            <a-sphere position="0 25 -80" radius="25" color="#e2e8f0" material="emissive: #94a3b8; emissiveIntensity: 0.3; fog: false"></a-sphere>
-            <a-sphere position="7 29 -78" radius="25" color="#020205" material="fog: false"></a-sphere>
+            <a-sphere id="shiver-moon" position="0 25 -70" radius="20" color="#ff0055" material="emissive: #ff0055; emissiveIntensity: 1; fog: false"></a-sphere>
+            
+            <a-entity id="boss-mesh" position="0 6 -25">
+                <a-octahedron scale="4 6 4" color="#111" material="wireframe: true; wireframeLineWidth: 4"></a-octahedron>
+                <a-cone position="0 0 1" radius-bottom="1" radius-top="0" rotation="90 0 0" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 3"></a-cone>
+            </a-entity>
         </a-entity>
 
         <a-entity id="decor-something" visible="false">
-            <a-sky color="#222510"></a-sky>
-            <a-box id="backroom-wall-l" position="-6 4 -20" scale="0.5 12 50" color="#cccc77" material="roughness: 0.8"></a-box>
-            <a-box id="backroom-wall-r" position="6 4 -20" scale="0.5 12 50" color="#cccc77" material="roughness: 0.8"></a-box>
-            <a-box id="backroom-roof" position="0 10 -20" scale="14 0.5 50" color="#eeeeaa" material="emissive: #ffffee; emissiveIntensity: 0.6"></a-box>
-            <a-box id="backroom-pillar-1" position="-3 4 -15" scale="1.5 8 1.5" color="#bbbb66"></a-box>
-            <a-box id="backroom-pillar-2" position="3 4 -25" scale="1.5 8 1.5" color="#bbbb66"></a-box>
+            <a-sky id="backroom-sky" color="#111405"></a-sky>
+            <a-box id="backroom-wall-l" position="-6 4 -20" scale="0.5 12 50" color="#cccc77"></a-box>
+            <a-box id="backroom-wall-r" position="6 4 -20" scale="0.5 12 50" color="#cccc77"></a-box>
+            <a-box id="backroom-roof" position="0 10 -20" scale="14 0.5 50" color="#eeeeaa" material="emissive: #ffffee; emissiveIntensity: 0.5"></a-box>
+            
+            <a-box id="backroom-p1" position="-3 4 -15" scale="2 8 2" color="#ffeb3b" material="emissive: #ffeb3b; emissiveIntensity: 0.5"></a-box>
+            <a-box id="backroom-p2" position="3 4 -25" scale="2 8 2" color="#ffeb3b" material="emissive: #ffeb3b; emissiveIntensity: 0.5"></a-box>
         </a-entity>
 
         <a-entity id="neon-rails" position="0 0 -20">
-            <a-box position="-2.5 0.1 0" scale="0.15 0.15 40" color="#ff0055" id="rail-l" material="emissive: #ff0055; emissiveIntensity: 2"></a-box>
-            <a-box position="2.5 0.1 0" scale="0.15 0.15 40" color="#00ffff" id="rail-r" material="emissive: #00ffff; emissiveIntensity: 2"></a-box>
+            <a-box position="-2.5 0.05 0" scale="0.1 0.1 40" color="#ff0055" id="rail-l" material="emissive: #ff0055; emissiveIntensity: 3"></a-box>
+            <a-box position="2.5 0.05 0" scale="0.1 0.1 40" color="#00ffff" id="rail-r" material="emissive: #00ffff; emissiveIntensity: 3"></a-box>
         </a-entity>
 
         <a-entity id="rig">
             <a-entity camera position="0 1.6 0" look-controls></a-entity>
             
-            <a-entity id="leftHand" oculus-touch-controls="hand: left" laser-controls="hand: left" raycaster="objects: .menu-btn; far: 10">
+            <a-entity id="leftHand" oculus-touch-controls="hand: left" laser-controls="hand: left" raycaster="objects: .menu-btn; far: 8">
                 <a-entity id="saber-l" visible="false">
-                    <a-cylinder rotation="90 0 0" radius="0.02" height="0.15" color="#111"></a-cylinder>
-                    <a-box position="0 0 -0.6" scale="0.025 0.025 1.2" color="#fff" material="emissive: #ff0055; emissiveIntensity: 6"></a-box>
+                    <a-cylinder rotation="90 0 0" radius="0.025" height="0.18" color="#222"></a-cylinder>
+                    <a-cylinder position="0 0 -0.6" radius="0.018" height="1.2" rotation="90 0 0" color="#fff" material="emissive: #ff0055; emissiveIntensity: 6"></a-cylinder>
+                    <a-sphere position="0 0 -1.2" radius="0.018" color="#ff0055" material="emissive: #ff0055; emissiveIntensity: 6"></a-sphere>
                 </a-entity>
             </a-entity>
 
-            <a-entity id="rightHand" oculus-touch-controls="hand: right" laser-controls="hand: right" raycaster="objects: .menu-btn; far: 10">
+            <a-entity id="rightHand" oculus-touch-controls="hand: right" laser-controls="hand: right" raycaster="objects: .menu-btn; far: 8">
                 <a-entity id="saber-r" visible="false">
-                    <a-cylinder rotation="90 0 0" radius="0.02" height="0.15" color="#111"></a-cylinder>
-                    <a-box position="0 0 -0.6" scale="0.025 0.025 1.2" color="#fff" material="emissive: #00ffff; emissiveIntensity: 6"></a-box>
+                    <a-cylinder rotation="90 0 0" radius="0.025" height="0.18" color="#222"></a-cylinder>
+                    <a-cylinder position="0 0 -0.6" radius="0.018" height="1.2" rotation="90 0 0" color="#fff" material="emissive: #00ffff; emissiveIntensity: 6"></a-cylinder>
+                    <a-sphere position="0 0 -1.2" radius="0.018" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 6"></a-sphere>
                 </a-entity>
             </a-entity>
         </a-entity>
@@ -62,15 +65,15 @@
         <a-entity id="note-container"></a-entity>
 
         <a-entity id="main-menu" position="0 1.6 -2.5">
-            <a-plane width="3" height="1.8" color="#05070f" opacity="0.95" material="roughness: 1">
-                <a-text value="CUSTOM BEAT SABER VR" align="center" color="#00ffff" position="0 0.6 0.05" scale="0.6 0.6 0.6"></a-text>
+            <a-plane width="3" height="1.8" color="#05070f" opacity="0.95">
+                <a-text value="BEAT SABER CUSTOM VR" align="center" color="#00ffff" position="0 0.6 0.05" scale="0.6 0.6 0.6"></a-text>
                 
-                <a-plane id="btn-lvl1" width="2.4" height="0.35" position="0 0.05 0.05" color="#1e293b" class="menu-btn" material="roughness: 1">
-                    <a-text value="1. SHIVER (Boss Level - Hard)" align="center" color="#fff" position="0 0 0.02" scale="0.4 0.4 0.4"></a-text>
+                <a-plane id="btn-lvl1" width="2.4" height="0.35" position="0 0.05 0.05" color="#1e293b" class="menu-btn">
+                    <a-text value="1. SHIVER BOSS (Hardcore Beat)" align="center" color="#fff" position="0 0 0.02" scale="0.4 0.4 0.4"></a-text>
                 </a-plane>
 
-                <a-plane id="btn-lvl2" width="2.4" height="0.35" position="0 -0.45 0.05" color="#1e293b" class="menu-btn" material="roughness: 1">
-                    <a-text value="2. BACKROOMS EDIT (Extreme Speed)" align="center" color="#fff" position="0 0 0.02" scale="0.4 0.4 0.4"></a-text>
+                <a-plane id="btn-lvl2" width="2.4" height="0.35" position="0 -0.45 0.05" color="#1e293b" class="menu-btn">
+                    <a-text value="2. BACKROOMS GLITCH (Insane Speed)" align="center" color="#fff" position="0 0 0.02" scale="0.4 0.4 0.4"></a-text>
                 </a-plane>
             </a-plane>
         </a-entity>
