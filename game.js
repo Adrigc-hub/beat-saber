@@ -1,199 +1,76 @@
-// Dibujar flecha en la textura del cubo
-const canvas = document.getElementById('arrow-texture');
-const ctx = canvas.getContext('2d');
-ctx.fillStyle = "rgba(0,0,0,0)"; ctx.fillRect(0, 0, 128, 128);
-ctx.fillStyle = "#ffffff"; ctx.beginPath();
-ctx.moveTo(64, 15); ctx.lineTo(15, 85); ctx.lineTo(48, 85); ctx.lineTo(48, 115);
-ctx.lineTo(80, 115); ctx.lineTo(80, 85); ctx.lineTo(113, 85); ctx.closePath(); ctx.fill();
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Beat Saber VR - Código Limpio</title>
+    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.3.2/dist/aframe-environment-component.min.js"></script>
+</head>
+<body>
 
-// --- MOTOR DE SINTETIZADOR DE AUDIO DIGITAL DE GITHUB ---
-// Esto genera música electrónica hardcore pura por código en tiempo real para saltar bloqueos de red.
-const AudioEngine = {
-    ctx: null,
-    init() { 
-        this.ctx = new (window.AudioContext || window.webkitAudioContext)(); 
-    },
-    playNote(freq, type, duration) {
-        if (!this.ctx) return;
-        let osc = this.ctx.createOscillator();
-        let gain = this.ctx.createGain();
-        osc.type = type; // 'sine', 'square', 'sawtooth', 'triangle'
-        osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.start();
-        osc.stop(this.ctx.currentTime + duration);
-    },
-    playHitSound() {
-        // Sonido de corte láser de alta velocidad
-        this.playNote(800, 'triangle', 0.08);
-        this.playNote(1200, 'sine', 0.05);
-    }
-};
+    <a-scene id="game-scene">
+        <a-light type="ambient" color="#666"></a-light>
+        <a-light type="directional" color="#fff" intensity="1" position="-1 4 2"></a-light>
 
-const levels = {
-    1: { name: "shiver", speed: 0.55, spawnInterval: 200, baseFreq: 110 },  // Ritmo rápido
-    2: { name: "backrooms", speed: 0.80, spawnInterval: 130, baseFreq: 75 } // Locura total de velocidad
-};
+        <a-entity id="env" environment="preset: starry; skyType: gradient; skyColor: #020205; horizonColor: #050510; grid: cross; gridColor: #111a2e"></a-entity>
 
-let activeLevel = null;
-let gameStarted = false;
-let activeCubes = [];
-let lastSpawnTime = 0;
-let totalSpawned = 0;
+        <a-entity id="decor-shiver" visible="false">
+            <a-sphere id="shiver-moon" position="0 20 -60" radius="18" color="#ff0055" material="shader: flat; fog: false"></a-sphere>
+            <a-entity id="boss-mesh" position="0 5 -25">
+                <a-octahedron scale="3 5 3" color="#ff0055" material="wireframe: true; wireframeLineWidth: 5"></a-octahedron>
+            </a-entity>
+        </a-entity>
 
-const container = document.getElementById('note-container');
+        <a-entity id="decor-something" visible="false">
+            <a-sky id="backroom-sky" color="#111405"></a-sky>
+            <a-box id="backroom-wall-l" position="-7 4 -20" scale="0.5 14 60" color="#dddd88" material="shader: flat"></a-box>
+            <a-box id="backroom-wall-r" position="7 4 -20" scale="0.5 14 60" color="#dddd88" material="shader: flat"></a-box>
+            <a-box id="backroom-roof" position="0 11 -20" scale="15 0.5 60" color="#ffffee" material="shader: flat"></a-box>
+            
+            <a-box id="backroom-p1" position="-3.5 4 -15" scale="1.8 8 1.8" color="#ffeb3b" material="shader: flat"></a-box>
+            <a-box id="backroom-p2" position="3.5 4 -25" scale="1.8 8 1.8" color="#ffeb3b" material="shader: flat"></a-box>
+        </a-entity>
 
-document.getElementById('btn-lvl1').addEventListener('click', () => launchLevel(1));
-document.getElementById('btn-lvl2').addEventListener('click', () => launchLevel(2));
+        <a-entity id="neon-rails" position="0 0 -20">
+            <a-box position="-2 0.05 0" scale="0.15 0.15 40" color="#ff0055" material="shader: flat"></a-box>
+            <a-box position="2 0.05 0" scale="0.15 0.15 40" color="#00ffff" material="shader: flat"></a-box>
+        </a-entity>
 
-function launchLevel(lvlId) {
-    if (gameStarted) return;
-    AudioEngine.init(); // Inicializa el generador de música por código
-    activeLevel = levels[lvlId];
-    gameStarted = true;
+        <a-entity id="rig">
+            <a-entity camera position="0 1.6 0" look-controls></a-entity>
+            
+            <a-entity id="leftHand" oculus-touch-controls="hand: left" laser-controls="hand: left" raycaster="objects: .menu-btn; far: 8">
+                <a-entity id="saber-l" visible="false">
+                    <a-cylinder rotation="90 0 0" radius="0.03" height="0.15" color="#333"></a-cylinder>
+                    <a-cylinder position="0 0 -0.6" radius="0.02" height="1.2" rotation="90 0 0" color="#ff0055" material="shader: flat"></a-cylinder>
+                </a-entity>
+            </a-entity>
 
-    // Control de pantallas
-    document.getElementById('main-menu').setAttribute('visible', 'false');
-    document.getElementById(lvlId === 1 ? 'decor-shiver' : 'decor-something').setAttribute('visible', 'true');
+            <a-entity id="rightHand" oculus-touch-controls="hand: right" laser-controls="hand: right" raycaster="objects: .menu-btn; far: 8">
+                <a-entity id="saber-r" visible="false">
+                    <a-cylinder rotation="90 0 0" radius="0.03" height="0.15" color="#333"></a-cylinder>
+                    <a-cylinder position="0 0 -0.6" radius="0.02" height="1.2" rotation="90 0 0" color="#00ffff" material="shader: flat"></a-cylinder>
+                </a-entity>
+            </a-entity>
+        </a-entity>
 
-    // Desactivar punteros y activar sables redondos neón
-    document.getElementById('leftHand').removeAttribute('raycaster');
-    document.getElementById('leftHand').removeAttribute('laser-controls');
-    document.getElementById('rightHand').removeAttribute('raycaster');
-    document.getElementById('rightHand').removeAttribute('laser-controls');
-    
-    document.getElementById('saber-l').setAttribute('visible', 'true');
-    document.getElementById('saber-r').setAttribute('visible', 'true');
+        <a-entity id="note-container"></a-entity>
 
-    lastSpawnTime = performance.now();
-    runEngine();
-}
+        <a-entity id="main-menu" position="0 1.6 -2.2">
+            <a-plane width="2.5" height="1.5" color="#070a14" opacity="0.95">
+                <a-text value="BEAT SABER VR CUSTOM" align="center" color="#00ffff" position="0 0.5 0.05" scale="0.5 0.5 0.5"></a-text>
+                
+                <a-plane id="btn-lvl1" width="2" height="0.3" position="0 0.05 0.05" color="#1e293b" class="menu-btn">
+                    <a-text value="1. SHIVER (Geometry Dash)" align="center" color="#fff" position="0 0 0.02" scale="0.35 0.35 0.35"></a-text>
+                </a-plane>
 
-function runEngine() {
-    if (!gameStarted) return;
-    let now = performance.now();
+                <a-plane id="btn-lvl2" width="2" height="0.3" position="0 -0.4 0.05" color="#1e293b" class="menu-btn">
+                    <a-text value="2. I FOUND SOMETHING" align="center" color="#fff" position="0 0 0.02" scale="0.35 0.35 0.35"></a-text>
+                </a-plane>
+            </a-plane>
+        </a-entity>
+    </a-scene>
 
-    // SPRAWN AUTOMÁTICO DE BLOQUES GARANTIZADO
-    if (now - lastSpawnTime >= activeLevel.spawnInterval) {
-        let positionsX = [-0.6, -0.2, 0.2, 0.6];
-        let positionsY = [1.1, 1.4, 1.7];
-        let rotations = [0, 90, 180, 270];
-        
-        let randomTrack = {
-            x: positionsX[Math.floor(Math.random() * positionsX.length)],
-            y: positionsY[Math.floor(Math.random() * positionsY.length)],
-            rot: rotations[Math.floor(Math.random() * rotations.length)],
-            type: totalSpawned % 2 // Alternancia estricta de sables
-        };
-        
-        spawnCube(randomTrack);
-        
-        // --- MÚSICA ELECTRÓNICA GENERADA POR CÓDIGO ---
-        // Sincroniza las notas musicales pesadas con la salida exacta de cada cubo
-        let melodyFreq = activeLevel.baseFreq * ((totalSpawned % 4) + 1);
-        AudioEngine.playNote(melodyFreq, activeLevel.name === "shiver" ? "sawtooth" : "square", 0.15);
-        AudioEngine.playNote(activeLevel.baseFreq, "sine", 0.2); // Bajo pesado de fondo
-
-        // --- ANIMACIÓN MUTANTE DE LA DECORACIÓN (Pulsos Neón de color y tamaño) ---
-        mutateEnvironment();
-
-        lastSpawnTime = now;
-        totalSpawned++;
-    }
-
-    // Posición física 3D de las Quest
-    let leftSaberPos = new THREE.Vector3();
-    let rightSaberPos = new THREE.Vector3();
-    document.getElementById('leftHand').object3D.getWorldPosition(leftSaberPos);
-    document.getElementById('rightHand').object3D.getWorldPosition(rightSaberPos);
-
-    // Movimiento lineal continuo y colisión matemática exacta
-    for (let i = activeCubes.length - 1; i >= 0; i--) {
-        let item = activeCubes[i];
-        if (!item.el.parentNode) { activeCubes.splice(i, 1); continue; }
-
-        let pos = item.el.getAttribute('position');
-        pos.z += activeLevel.speed; // Avanza hacia la posición del jugador
-        item.el.setAttribute('position', pos);
-
-        let cubeWorldPos = new THREE.Vector3(pos.x, pos.y, pos.z);
-        let distLeft = leftSaberPos.distanceTo(cubeWorldPos);
-        let distRight = rightSaberPos.distanceTo(cubeWorldPos);
-
-        // Registro de colisión milimétrico con los sables cilíndricos (0.75 metros de alcance)
-        if ((item.type === 0 && distLeft < 0.75) || (item.type === 1 && distRight < 0.75)) {
-            AudioEngine.playHitSound(); // Sonido de impacto real generado al instante
-            item.el.parentNode.removeChild(item.el);
-            activeCubes.splice(i, 1);
-            continue;
-        }
-
-        if (pos.z > 1.8) {
-            item.el.parentNode.removeChild(item.el);
-            activeCubes.splice(i, 1);
-        }
-    }
-
-    requestAnimationFrame(runEngine);
-}
-
-function spawnCube(data) {
-    let cubeGroup = document.createElement('a-entity');
-    cubeGroup.setAttribute('position', `${data.x} ${data.y} -35`);
-    cubeGroup.setAttribute('rotation', `0 0 ${data.rot}`);
-
-    let body = document.createElement('a-box');
-    body.setAttribute('scale', '0.4 0.4 0.4');
-    
-    let colorHex = data.type === 0 ? '#ff0055' : '#00ffff';
-    body.setAttribute('color', colorHex);
-    body.setAttribute('material', `emissive: ${colorHex}; emissiveIntensity: 2.5; roughness: 0`);
-
-    let arrowFace = document.createElement('a-plane');
-    arrowFace.setAttribute('position', '0 0 0.21');
-    arrowFace.setAttribute('scale', '0.3 0.3 0.3');
-    arrowFace.setAttribute('material', 'src: #arrow-texture; transparent: true; shader: flat');
-
-    cubeGroup.appendChild(body);
-    cubeGroup.appendChild(arrowFace);
-    container.appendChild(cubeGroup);
-
-    activeCubes.push({ el: cubeGroup, type: data.type });
-}
-
-// --- FUNCIÓN DE MUTACIÓN GENERAL DE ESCENARIOS (Color y deformidad total) ---
-function mutateEnvironment() {
-    let neonColors = ["#ff0055", "#00ffff", "#ffeb3b", "#9c27b0", "#4caf50"];
-    let randomColor = neonColors[Math.floor(Math.random() * neonColors.length)];
-    let pulseScale = 1 + (Math.random() * 0.4);
-
-    if (activeLevel.name === "shiver") {
-        // La luna cambia de tamaño y color locamente al ritmo de Shiver
-        let moon = document.getElementById('shiver-moon');
-        let boss = document.getElementById('boss-mesh');
-        moon.setAttribute('color', randomColor);
-        moon.setAttribute('material', `emissive: ${randomColor}; emissiveIntensity: 1.5`);
-        moon.setAttribute('scale', `${pulseScale} ${pulseScale} ${pulseScale}`);
-        
-        // El Jefe central gira violentamente
-        boss.setAttribute('rotation', `0 ${totalSpawned * 15} ${totalSpawned * 5}`);
-    } else {
-        // Los Backrooms sufren un glitch severo de color y escala en las columnas
-        let p1 = document.getElementById('backroom-p1');
-        let p2 = document.getElementById('backroom-p2');
-        let sky = document.getElementById('backroom-sky');
-        let roof = document.getElementById('backroom-roof');
-        
-        p1.setAttribute('color', randomColor);
-        p2.setAttribute('color', randomColor);
-        p1.setAttribute('scale', `2 ${8 * pulseScale} 2`);
-        p2.setAttribute('scale', `2 ${8 * (2 - pulseScale)} 2`);
-        
-        // Parpadeo de luz psicodélica en el cielo y techo de la oficina
-        sky.setAttribute('color', totalSpawned % 2 === 0 ? "#111405" : "#220525");
-        roof.setAttribute('material', `emissive: ${randomColor}; emissiveIntensity: ${Math.random() * 3}`);
-    }
-}
+    <script src="game.js"></script>
+</body>
+</html>
