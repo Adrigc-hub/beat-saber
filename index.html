@@ -2,13 +2,13 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Beat Saber VR - Dreamcore & Fixed Sparks</title>
+    <title>Beat Saber VR & Mobile Magic Canvas</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.3.2/dist/aframe-environment-component.min.js"></script>
 </head>
 <body>
 
-    <a-scene xr-mode-ui="enabled: true">
+    <a-scene xr-mode-ui="enabled: true" id="scene">
         
         <a-assets>
             <audio id="music-easy" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
@@ -19,74 +19,88 @@
         </a-assets>
 
         <a-entity id="ambient-env" environment="preset: poison; lighting: none; ground: spikes; grid: cross"></a-entity>
-        <a-entity light="type: ambient; color: #111; intensity: 1"></a-entity>
+        <a-entity light="type: ambient; color: #222; intensity: 1.2"></a-entity>
         <a-entity id="neon-glow" light="type: directional; color: #ff0055; intensity: 1.5" position="0 8 -5"></a-entity>
 
-        <a-entity id="decorations" position="0 0 0">
-            <a-torus class="moving-ring" color="#ff0055" radius="5" tube="0.08" position="0 2.5 -10" material="emissive: #ff0055; emissiveIntensity: 4"></a-torus>
-            <a-torus class="moving-ring" color="#00ffff" radius="5" tube="0.08" position="0 2.5 -20" material="emissive: #00ffff; emissiveIntensity: 4"></a-torus>
-            
-            <a-box position="-6 5 -15" scale="0.8 12 0.8" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 3"></a-box>
-            <a-box position="6 5 -15" scale="0.8 12 0.8" color="#ff0055" material="emissive: #ff0055; emissiveIntensity: 3"></a-box>
-        </a-entity>
-
-        <a-entity id="dreamcore-decor" visible="false">
-            <a-sphere position="0 6 -25" radius="2" color="#fff" material="roughness: 0.1">
-                <a-sphere position="0 0 1.8" radius="0.6" color="#000"></a-sphere> </a-sphere>
-            <a-box position="-3 5 -20" scale="3 0.1 1" color="#ff00ff" rotation="0 0 30" material="emissive: #ff00ff"></a-box>
-            <a-box position="3 5 -20" scale="3 0.1 1" color="#ff00ff" rotation="0 0 -30" material="emissive: #ff00ff"></a-box>
-            <a-sphere position="-4 2 -12" radius="0.4" color="#fff"><a-sphere position="0 0 0.35" radius="0.12" color="#ff0000"></a-sphere></a-sphere>
-            <a-sphere position="4 3 -16" radius="0.4" color="#fff"><a-sphere position="0 0 0.35" radius="0.12" color="#ff0000"></a-sphere></a-sphere>
+        <a-entity id="decorations">
+            <a-torus color="#ff0055" radius="5" tube="0.08" position="0 2.5 -12" material="emissive: #ff0055; emissiveIntensity: 3"></a-torus>
+            <a-torus color="#00ffff" radius="5" tube="0.08" position="0 2.5 -24" material="emissive: #00ffff; emissiveIntensity: 3"></a-torus>
+            <a-box position="-6 5 -15" scale="0.8 12 0.8" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 2"></a-box>
+            <a-box position="6 5 -15" scale="0.8 12 0.8" color="#ff0055" material="emissive: #ff0055; emissiveIntensity: 2"></a-box>
         </a-entity>
 
         <a-entity id="rig" position="0 0 0">
-            <a-camera id="head" position="0 1.6 0">
-                <a-cursor id="mouse-fallback" color="#fff" visible="false"></a-cursor>
+            <a-camera id="head" position="0 1.6 0" look-controls="enabled: true">
+                <a-cursor id="mouse-fallback" raycaster="objects: .menu-btn, .cube, .draw-zone; far: 40" material="color: #ffffff; shader: flat" position="0 0 -1"></a-cursor>
             </a-camera>
             
-            <a-entity id="left-hand" laser-controls="hand: left" raycaster="objects: .cube, .wall; far: 1.6; interval: 30">
-                <a-cylinder color="#444" radius="0.025" height="0.25" position="0 0 0" rotation="90 0 0" material="metalness: 1; roughness: 0.2"></a-cylinder>
-                <a-cylinder id="saber-blade-left" color="#ff0000" radius="0.018" height="1.2" position="0 0 -0.75" rotation="90 0 0" material="emissive: #ff0000; emissiveIntensity: 5"></a-cylinder>
+            <a-entity id="left-hand" laser-controls="hand: left" raycaster="objects: .cube, .wall, .draw-zone; far: 5; interval: 30">
+                <a-cylinder id="saber-blade-left" color="#ff0000" radius="0.018" height="1.2" position="0 0 -0.6" rotation="90 0 0" material="emissive: #ff0000; emissiveIntensity: 4"></a-cylinder>
             </a-entity>
             
-            <a-entity id="right-hand" laser-controls="hand: right" raycaster="objects: .menu-btn, .cube, .wall; far: 7; interval: 30">
-                <a-cylinder color="#444" radius="0.025" height="0.25" position="0 0 0" rotation="90 0 0" material="metalness: 1; roughness: 0.2"></a-cylinder>
-                <a-cylinder id="saber-blade-right" color="#0088ff" radius="0.018" height="1.2" position="0 0 -0.75" rotation="90 0 0" material="emissive: #0088ff; emissiveIntensity: 5"></a-cylinder>
-                <a-line start="0 0 0" end="0 0 -7" color="#0088ff" opacity="0.7"></a-line>
+            <a-entity id="right-hand" laser-controls="hand: right" raycaster="objects: .menu-btn, .cube, .wall, .draw-zone; far: 15; interval: 30">
+                <a-cylinder id="saber-blade-right" color="#0088ff" radius="0.018" height="1.2" position="0 0 -0.6" rotation="90 0 0" material="emissive: #0088ff; emissiveIntensity: 4"></a-cylinder>
             </a-entity>
-
-            <a-entity id="spark-container"></a-entity>
         </a-entity>
 
         <a-entity id="gameplay-container"></a-entity>
-
         <a-entity id="game-ui" position="0 3.5 -3.5" visible="false">
             <a-text id="score-text" value="SCORE: 0" align="center" color="#fff" width="6"></a-text>
         </a-entity>
 
-        <a-entity id="main-menu" position="0 1.6 -2">
-            <a-entity id="panel-levels" visible="true">
+        <a-entity id="magic-mode-container" position="0 1.6 -3.5" visible="false">
+            <a-entity id="npc-enemy" position="0 1.2 -1">
+                <a-cone id="npc-mesh" color="#7700aa" radius-bottom="0.4" height="1.2" material="emissive: #440066; emissiveIntensity: 2"></a-cone>
+                <a-sphere position="0 0.8 0" radius="0.25" color="#fff"><a-sphere position="0 0 0.2" radius="0.08" color="#000"></a-sphere></a-sphere>
+                <a-text id="npc-hp-text" value="HP: 100/100" align="center" position="0 1.4 0" width="4" color="#ff3333"></a-text>
+            </a-entity>
+
+            <a-text id="draw-instruction" value="DIBUJA UN TRIANGULO" align="center" position="0 0.2 0" width="4" color="#00ffff"></a-text>
+            <a-plane id="canvas-trigger" class="draw-zone" color="#222" opacity="0.1" width="2" height="1.5" position="0 -0.5 0"></a-plane>
+            <a-entity id="drawn-lines-container"></a-entity>
+        </a-entity>
+
+        <a-entity id="main-menu" position="0 1.6 -2.2">
+            
+            <a-entity id="menu-blocks" visible="true">
                 <a-plane color="#0a0a0a" width="2.8" height="2.2" opacity="0.95"></a-plane>
-                <a-text value="SELECT SONG" align="center" position="0 0.8 0.03" width="6" color="#00ffff"></a-text>
+                <a-text value="BEAT SABER RHYTHM" align="center" position="0 0.8 0.03" width="5.5" color="#00ffff"></a-text>
                 
-                <a-entity class="menu-btn" data-sel-level="1" geometry="primitive: plane; width: 2.4; height: 0.2" material="color: #222" position="0 0.4 0.03" text="value: 1. Tutorial Chill; align: center; width: 3.5"></a-entity>
-                <a-entity class="menu-btn" data-sel-level="2" geometry="primitive: plane; width: 2.4; height: 0.2" material="color: #222" position="0 0.15 0.03" text="value: 2. Cyber Beats; align: center; width: 3.5"></a-entity>
-                <a-entity class="menu-btn" data-sel-level="3" geometry="primitive: plane; width: 2.4; height: 0.2" material="color: #222" position="0 -0.1 0.03" text="value: 3. Neon Rush; align: center; width: 3.5"></a-entity>
-                <a-entity class="menu-btn" data-sel-level="4" geometry="primitive: plane; width: 2.4; height: 0.2" material="color: #443300" position="0 -0.35 0.03" text="value: 4. DREAMCORE BACKROOMS; align: center; width: 3.5; color: #ffcc00"></a-entity>
-                <a-entity class="menu-btn" data-sel-level="5" geometry="primitive: plane; width: 2.4; height: 0.2" material="color: #550022" position="0 -0.60 0.03" text="value: 5. SHIVER X (Extreme); align: center; width: 3.5; color: #ff0055"></a-entity>
+                <a-entity id="btn-go-magic" class="menu-btn" geometry="primitive: plane; width: 0.4; height: 0.2" material="color: #00ffff" position="1.1 0.8 0.04" text="value: ->; align: center; color: #000; width: 4"></a-entity>
+                
+                <a-entity class="menu-btn" data-sel-level="1" geometry="primitive: plane; width: 2.3; height: 0.18" material="color: #222" position="0 0.4 0.03" text="value: 1. Chill Tutorial; align: center; width: 3.5"></a-entity>
+                <a-entity class="menu-btn" data-sel-level="2" geometry="primitive: plane; width: 2.3; height: 0.18" material="color: #222" position="0 0.15 0.03" text="value: 2. Cyber Beats; align: center; width: 3.5"></a-entity>
+                <a-entity class="menu-btn" data-sel-level="3" geometry="primitive: plane; width: 2.3; height: 0.18" material="color: #222" position="0 -0.1 0.03" text="value: 3. Neon Rush; align: center; width: 3.5"></a-entity>
+                <a-entity class="menu-btn" data-sel-level="4" geometry="primitive: plane; width: 2.3; height: 0.18" material="color: #443300" position="0 -0.35 0.03" text="value: 4. Lost Backrooms; align: center; width: 3.5; color: #ffcc00"></a-entity>
+                <a-entity class="menu-btn" data-sel-level="5" geometry="primitive: plane; width: 2.3; height: 0.18" material="color: #550022" position="0 -0.60 0.03" text="value: 5. Shiver X (Demon); align: center; width: 3.5; color: #ff0055"></a-entity>
+            </a-entity>
+
+            <a-entity id="menu-magic" visible="false" position="0 0 -50">
+                <a-plane color="#0e0514" width="2.8" height="2.2" opacity="0.95"></a-plane>
+                <a-text value="MAGIC SPELL DRAWING" align="center" position="0 0.8 0.03" width="5.5" color="#bc00ff"></a-text>
+                
+                <a-entity id="btn-back-blocks" class="menu-btn" geometry="primitive: plane; width: 0.4; height: 0.2" material="color: #bc00ff" position="-1.1 0.8 0.04" text="value: <-; align: center; color: #fff; width: 4"></a-entity>
+
+                <a-entity class="menu-btn" data-magic-level="1" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #221035" position="0 0.45 0.03" text="value: M1. Hechizo de Fuego (Facil); align: center; width: 3.2"></a-entity>
+                <a-entity class="menu-btn" data-magic-level="2" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #221035" position="0 0.25 0.03" text="value: M2. Runa de Rayo (Medio); align: center; width: 3.2"></a-entity>
+                <a-entity class="menu-btn" data-magic-level="3" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #221035" position="0 0.05 0.03" text="value: M3. Escudo de Hielo; align: center; width: 3.2"></a-entity>
+                <a-entity class="menu-btn" data-magic-level="4" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #221035" position="0 -0.15 0.03" text="value: M4. Vortice Oscuro; align: center; width: 3.2"></a-entity>
+                <a-entity class="menu-btn" data-magic-level="5" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #221035" position="0 -0.35 0.03" text="value: M5. Invocacion ancestral; align: center; width: 3.2"></a-entity>
+                <a-entity class="menu-btn" data-magic-level="6" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #350520" position="0 -0.55 0.03" text="value: M6. Alquimia Prohibida; align: center; width: 3.2; color: #ff00ff"></a-entity>
+                <a-entity class="menu-btn" data-magic-level="7" geometry="primitive: plane; width: 2.3; height: 0.15" material="color: #550000" position="0 -0.75 0.03" text="value: M7. SUPREMO INFERNAL (BOSS FIGHT); align: center; width: 3.2; color: #ff3333"></a-entity>
             </a-entity>
 
             <a-entity id="panel-difficulty" position="0 0 0" visible="false">
                 <a-plane color="#050505" width="2.8" height="2.2" opacity="0.95"></a-plane>
                 <a-text id="diff-title" value="CHOOSE DIFFICULTY" align="center" position="0 0.8 0.03" width="5.5" color="#ff0055"></a-text>
                 
-                <a-entity class="menu-btn" data-diff="0" geometry="primitive: plane; width: 1.1; height: 0.22" material="color: #222" position="-0.65 0.4 0.03" text="value: FACIL; align: center"></a-entity>
-                <a-entity class="menu-btn" data-diff="1" geometry="primitive: plane; width: 1.1; height: 0.22" material="color: #222" position="0.65 0.4 0.03" text="value: MEDIO; align: center"></a-entity>
-                <a-entity class="menu-btn" data-diff="2" geometry="primitive: plane; width: 1.1; height: 0.22" material="color: #222" position="-0.65 0.1 0.03" text="value: DIFICIL; align: center"></a-entity>
-                <a-entity class="menu-btn" data-diff="3" geometry="primitive: plane; width: 1.1; height: 0.22" material="color: #222" position="0.65 0.1 0.03" text="value: HARDER; align: center"></a-entity>
-                <a-entity class="menu-btn" data-diff="4" geometry="primitive: plane; width: 2.4; height: 0.22" material="color: #3b2300" position="0 -0.2 0.03" text="value: EASY DEMON; align: center; color: #ffaa00"></a-entity>
-                <a-entity class="menu-btn" data-diff="5" geometry="primitive: plane; width: 2.4; height: 0.22" material="color: #520000" position="0 -0.48 0.03" text="value: HARD HARD DEMON; align: center; color: #ff3333"></a-entity>
-                <a-entity class="menu-btn" data-diff="6" geometry="primitive: plane; width: 2.4; height: 0.22" material="color: #800020" position="0 -0.76 0.03" text="value: EXTREME DEMON; align: center; color: #ff0055"></a-entity>
+                <a-entity class="menu-btn" data-diff="0" geometry="primitive: plane; width: 1.1; height: 0.2" material="color: #222" position="-0.65 0.4 0.03" text="value: FACIL; align: center"></a-entity>
+                <a-entity class="menu-btn" data-diff="1" geometry="primitive: plane; width: 1.1; height: 0.2" material="color: #222" position="0.65 0.4 0.03" text="value: MEDIO; align: center"></a-entity>
+                <a-entity class="menu-btn" data-diff="2" geometry="primitive: plane; width: 1.1; height: 0.2" material="color: #222" position="-0.65 0.1 0.03" text="value: DIFICIL; align: center"></a-entity>
+                <a-entity class="menu-btn" data-diff="3" geometry="primitive: plane; width: 1.1; height: 0.2" material="color: #222" position="0.65 0.1 0.03" text="value: HARDER; align: center"></a-entity>
+                <a-entity class="menu-btn" data-diff="4" geometry="primitive: plane; width: 2.4; height: 0.2" material="color: #3b2300" position="0 -0.2 0.03" text="value: EASY DEMON; align: center; color: #ffaa00"></a-entity>
+                <a-entity class="menu-btn" data-diff="5" geometry="primitive: plane; width: 2.4; height: 0.2" material="color: #520000" position="0 -0.48 0.03" text="value: HARD DEMON; align: center; color: #ff3333"></a-entity>
+                <a-entity class="menu-btn" data-diff="6" geometry="primitive: plane; width: 2.4; height: 0.2" material="color: #800020" position="0 -0.76 0.03" text="value: EXTREME DEMON; align: center; color: #ff0055"></a-entity>
 
                 <a-entity id="btn-back" class="menu-btn" geometry="primitive: plane; width: 0.6; height: 0.15" material="color: #444" position="0 1.05 0.03" text="value: BACK; align: center; width: 3"></a-entity>
             </a-entity>
@@ -95,68 +109,103 @@
     </a-scene>
 
     <script>
-        const dificultades = ["FACIL", "MEDIO", "DIFICIL", "HARDER", "EASY DEMON", "HARD DEMON", "EXTREME DEMON"];
         const diffMultipliers = [0.6, 1.0, 1.4, 1.8, 2.3, 2.9, 4.0];
-
         let selectedLevelId = 1;
         let selectedDiffIdx = 1;
         let score = 0;
         let gameActive = false;
+        let magicModeActive = false;
+        let isDrawing = false;
         let lastSpawnTime = 0;
         let currentAudio = null;
         let activeCubes = [];
         let activeWalls = [];
-        let liveSparks = [];
         let currentLevelConfig = {};
+
+        // Variables de Magia
+        let enemyHP = 100;
+        let maxEnemyHP = 100;
+        let currentMagicLevel = 1;
+        let drawnPoints = [];
+        let canvasBoundingBox = null;
 
         const levelsData = {
             1: { audio: 'music-easy', baseSpeed: 6, baseSpawnRate: 1600, env: 'night', color: '#00ffff' },
             2: { audio: 'music-normal', baseSpeed: 9, baseSpawnRate: 1300, env: 'goaland', color: '#00ff88' },
             3: { audio: 'music-hard', baseSpeed: 13, baseSpawnRate: 1000, env: 'tron', color: '#ff00ff' },
-            4: { audio: 'music-backrooms', baseSpeed: 16, baseSpawnRate: 720, env: 'dream', color: '#ffcc00' }, 
+            4: { audio: 'music-backrooms', baseSpeed: 16, baseSpawnRate: 720, env: 'dream', color: '#ffaa00' }, 
             5: { audio: 'music-shiver', baseSpeed: 25, baseSpawnRate: 380, env: 'poison', color: '#ff0055' } 
         };
 
-        // MENU CONTROLS
+        const shapesList = ["LINEA", "TRIANGULO", "CUADRADO", "CIRCULO", "ZIGZAG", "ESTRELLA", "RUNA SUPREMA"];
+
+        // CONTROLADORES DE TRÁFICO ENTRE MENÚS
+        document.getElementById('btn-go-magic').addEventListener('click', function() {
+            document.getElementById('menu-blocks').setAttribute('visible', 'false');
+            document.getElementById('menu-blocks').setAttribute('position', '0 0 -50');
+            const mm = document.getElementById('menu-magic');
+            mm.setAttribute('visible', 'true');
+            mm.setAttribute('position', '0 0 0');
+        });
+
+        document.getElementById('btn-back-blocks').addEventListener('click', function() {
+            document.getElementById('menu-magic').setAttribute('visible', 'false');
+            document.getElementById('menu-magic').setAttribute('position', '0 0 -50');
+            const mb = document.getElementById('menu-blocks');
+            mb.setAttribute('visible', 'true');
+            mb.setAttribute('position', '0 0 0');
+        });
+
+        // Seleccionar nivel de bloques
         document.querySelectorAll('[data-sel-level]').forEach(btn => {
             btn.addEventListener('click', function() {
                 selectedLevelId = this.getAttribute('data-sel-level');
-                document.getElementById('panel-levels').setAttribute('visible', 'false');
+                document.getElementById('menu-blocks').setAttribute('visible', 'false');
                 document.getElementById('panel-difficulty').setAttribute('visible', 'true');
                 document.getElementById('diff-title').setAttribute('text', `value: LEVEL ${selectedLevelId} - SELECT DIFF; align: center; width: 5.5`);
             });
         });
 
         document.getElementById('btn-back').addEventListener('click', function() {
-            document.getElementById('panel-levels').setAttribute('visible', 'true');
+            document.getElementById('menu-blocks').setAttribute('visible', 'true');
             document.getElementById('panel-difficulty').setAttribute('visible', 'false');
         });
 
         document.querySelectorAll('[data-diff]').forEach(btn => {
             btn.addEventListener('click', function() {
                 selectedDiffIdx = parseInt(this.getAttribute('data-diff'));
-                startLevel();
+                startBlockLevel();
             });
         });
 
-        function startLevel() {
-            currentLevelConfig = levelsData[selectedLevelId];
-            
-            const menu = document.getElementById('main-menu');
-            menu.setAttribute('visible', 'false');
-            menu.setAttribute('position', '0 -100 0');
+        // SELECCIONAR NIVEL DE MAGIA (MODO CELULAR / VR CANVAS)
+        document.querySelectorAll('[data-magic-level]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                currentMagicLevel = parseInt(this.getAttribute('data-magic-level'));
+                startMagicLevel();
+            });
+        });
 
-            document.getElementById('game-ui').setAttribute('visible', 'true');
-            document.getElementById('ambient-env').setAttribute('environment', `preset: ${currentLevelConfig.env}; lighting: none`);
-            document.getElementById('neon-glow').setAttribute('light', `color: ${currentLevelConfig.color}; intensity: 2`);
+        // MOBILE CONTROL COMPLEMENT: Hacer que los sables sigan el cursor/dedo automáticamente si se juega en pantalla táctil
+        window.addEventListener('mousemove', handlePointerMove);
+        window.addEventListener('touchmove', function(e) {
+            if(e.touches.length > 0) handlePointerMove(e.touches[0]);
+        });
 
-            // Activar decoración especial de Dreamcore si es el nivel 4
-            if(selectedLevelId == 4) {
-                document.getElementById('dreamcore-decor').setAttribute('visible', 'true');
-            } else {
-                document.getElementById('dreamcore-decor').setAttribute('visible', 'false');
+        function handlePointerMove(e) {
+            if (gameActive && !magicModeActive) {
+                // Mapear posición de mouse/dedo para mover las hojas de luz al frente si no hay casco VR
+                const x = (e.clientX / window.innerWidth) * 3 - 1.5;
+                const y = -(e.clientY / window.innerHeight) * 2 + 2.3;
+                document.getElementById('right-hand').setAttribute('position', `${x} ${y} -1`);
             }
+        }
 
+        function startBlockLevel() {
+            currentLevelConfig = levelsData[selectedLevelId];
+            hideMainMenu();
+            document.getElementById('game-ui').setAttribute('visible', 'true');
+            
             currentAudio = document.getElementById(currentLevelConfig.audio);
             currentAudio.currentTime = 0;
             currentAudio.play();
@@ -167,19 +216,96 @@
 
             score = 0;
             updateScore();
-            activeCubes = [];
-            activeWalls = [];
             gameActive = true;
+            magicModeActive = false;
             lastSpawnTime = performance.now();
         }
 
+        function startMagicLevel() {
+            hideMainMenu();
+            magicModeActive = true;
+            gameActive = true;
+            
+            // Configurar vida de enemigo y Boss final (Nivel 7)
+            if(currentMagicLevel === 7) {
+                maxEnemyHP = 400;
+                document.getElementById('npc-mesh').setAttribute('geometry', 'primitive: torusKnot; radius: 0.5; tube: 0.15');
+                document.getElementById('npc-mesh').setAttribute('material', 'color: #ff0000; emissive: #440000');
+                document.getElementById('draw-instruction').setAttribute('text', 'value: !!! BOSS FIGHT: RUNA INFERNAL !!!; color: #ff2222; align: center');
+            } else {
+                maxEnemyHP = 100 + (currentMagicLevel * 20);
+                document.getElementById('npc-mesh').setAttribute('geometry', 'primitive: cone; radiusBottom: 0.4; height: 1.2');
+                document.getElementById('npc-mesh').setAttribute('material', 'color: #7700aa; emissive: #440066');
+                document.getElementById('draw-instruction').setAttribute('text', `value: DIBUJA UN ${shapesList[currentMagicLevel-1]}; color: #00ffff; align: center`);
+            }
+            
+            enemyHP = maxEnemyHP;
+            updateNPCUI();
+            
+            document.getElementById('magic-mode-container').setAttribute('visible', 'true');
+            document.getElementById('drawn-lines-container').innerHTML = '';
+            drawnPoints = [];
+        }
+
+        // CAPTURA DE DIBUJO CON INTERFAZ TÁCTIL (Móvil) O MANDO VR (Trigger de arriba / Grip superior)
+        const canvasEl = document.getElementById('canvas-trigger');
+        
+        canvasEl.addEventListener('mousedown', startDrawing);
+        canvasEl.addEventListener('touchstart', startDrawing);
+        window.addEventListener('mouseup', stopDrawing);
+        window.addEventListener('touchend', stopDrawing);
+
+        // Soporte nativo para botones superiores de mandos de Realidad Virtual (Trigger/Grip)
+        document.getElementById('right-hand').addEventListener('triggerdown', startDrawing);
+        document.getElementById('right-hand').addEventListener('triggerup', stopDrawing);
+
+        function startDrawing(e) {
+            if (!magicModeActive) return;
+            isDrawing = true;
+            drawnPoints = [];
+            document.getElementById('drawn-lines-container').innerHTML = '';
+        }
+
+        function stopDrawing() {
+            if (!isDrawing || !magicModeActive) return;
+            isDrawing = false;
+            
+            // Procesar calidad del dibujo mágico realizado
+            if (drawnPoints.length > 2) {
+                let damage = Math.floor(Math.random() * 25) + 15; // Daño base basado en el trazo libre
+                enemyHP = Math.max(0, enemyHP - damage);
+                updateNPCUI();
+
+                if (enemyHP <= 0) {
+                    alert(currentMagicLevel === 7 ? "¡¡¡HAS DERROTADO AL JEFE SUPREMO INTERNAL!!!" : "¡Enemigo Derrotado con tu magia!");
+                    returnToMenu();
+                }
+            }
+        }
+
+        // Registrar puntos en el plano flotante
+        canvasEl.addEventListener('mouseenter', function(e) {
+            if(!isDrawing || !magicModeActive) return;
+            
+            // Obtener el punto de intersección tridimensional del Raycaster (sirve tanto para VR como clic móvil)
+            const intersection = document.getElementById('mouse-fallback').components.raycaster.getIntersection(canvasEl);
+            if(intersection) {
+                const pt = intersection.point;
+                drawnPoints.push(pt);
+                
+                // Pintar la línea mágica morada en la pantalla
+                const dot = document.createElement('a-sphere');
+                dot.setAttribute('radius', '0.02');
+                dot.setAttribute('color', '#bc00ff');
+                dot.setAttribute('material', 'emissive: #ff00ff; emissiveIntensity: 2');
+                dot.setAttribute('position', `${pt.x} ${pt.y} ${pt.z + 0.02}`);
+                document.getElementById('drawn-lines-container').appendChild(dot);
+            }
+        });
+
         function spawnCube() {
             const container = document.getElementById('gameplay-container');
-            
-            if (Math.random() > 0.85) {
-                spawnWall();
-                return;
-            }
+            if (Math.random() > 0.85) { spawnWall(); return; }
 
             const cube = document.createElement('a-entity');
             const posX = (Math.random() * 1.6) - 0.8; 
@@ -191,13 +317,12 @@
 
             cube.setAttribute('class', 'cube');
             cube.setAttribute('geometry', 'primitive: box; width: 0.36; height: 0.36; depth: 0.36');
-            cube.setAttribute('material', `color: ${cubeColor}; emissive: ${cubeColor}; emissiveIntensity: 2; roughness: 0.2`);
+            cube.setAttribute('material', `color: ${cubeColor}; emissive: ${cubeColor}; emissiveIntensity: 2`);
             cube.setAttribute('position', `${posX} ${posY} ${posZ}`);
 
-            // Flecha apuntando al frente
             const arrow = document.createElement('a-cone');
             arrow.setAttribute('geometry', 'radiusBottom: 0.08; radiusTop: 0; height: 0.18');
-            arrow.setAttribute('material', 'color: #ffffff; emissive: #ffffff; emissiveIntensity: 3');
+            arrow.setAttribute('material', 'color: #ffffff; emissive: #ffffff; emissiveIntensity: 2');
             
             const directions = [0, 90, 180, 270];
             const randomRot = directions[Math.floor(Math.random() * directions.length)];
@@ -214,37 +339,18 @@
         function spawnWall() {
             const container = document.getElementById('gameplay-container');
             const wall = document.createElement('a-box');
-            const isLeft = Math.random() > 0.5;
-            const posX = isLeft ? -0.9 : 0.9;
+            const posX = Math.random() > 0.5 ? -0.9 : 0.9;
 
             wall.setAttribute('class', 'wall');
             wall.setAttribute('position', `${posX} 2 -35`);
             wall.setAttribute('scale', '1.2 3.5 0.5'); 
-            wall.setAttribute('material', 'color: #ff0022; opacity: 0.6; transparent: true; emissive: #ff0022; emissiveIntensity: 1.5');
+            wall.setAttribute('material', 'color: #ff0022; opacity: 0.5; transparent: true; emissive: #ff0022');
 
             container.appendChild(wall);
             activeWalls.push(wall);
         }
 
-        function createNativeSpark(pos) {
-            const container = document.getElementById('spark-container');
-            const spark = document.createElement('a-sphere');
-            
-            spark.setAttribute('radius', '0.015');
-            spark.setAttribute('material', 'color: #bc00ff; emissive: #ff00ff; emissiveIntensity: 3');
-            spark.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
-            
-            spark.userData = {
-                vx: (Math.random() - 0.5) * 3,
-                vy: (Math.random() * 2) + 1,
-                vz: (Math.random() - 0.5) * 3,
-                age: 0
-            };
-            
-            container.appendChild(spark);
-            liveSparks.push(spark);
-        }
-
+        // FRAME LOOP (DELTA TIME PERFECTO)
         let lastFrameTime = performance.now();
 
         function gameLoop() {
@@ -252,49 +358,7 @@
             const deltaTime = (now - lastFrameTime) / 1000;
             lastFrameTime = now;
 
-            // ANIMACIÓN DE LAS CHISPAS ACTIVAS
-            for (let s = liveSparks.length - 1; s >= 0; s--) {
-                const spark = liveSparks[s];
-                let sPos = spark.getAttribute('position');
-                let uData = spark.userData;
-                
-                uData.age += deltaTime;
-                if (uData.age > 0.35) {
-                    spark.parentNode.removeChild(spark);
-                    liveSparks.splice(s, 1);
-                    continue;
-                }
-                
-                sPos.x += uData.vx * deltaTime;
-                sPos.y += uData.vy * deltaTime;
-                sPos.z += uData.vz * deltaTime;
-                uData.vy -= 9.8 * deltaTime; 
-                spark.setAttribute('position', sPos);
-            }
-
-            // CONTROL FIX DE CRASH DE CHISPAS: Solo verificar colisión si el visor/mandos están activos en espacio real
-            const leftEl = document.getElementById('saber-blade-left');
-            const rightEl = document.getElementById('saber-blade-right');
-            
-            if (leftEl && rightEl && leftEl.object3D && rightEl.object3D) {
-                const leftPos = leftEl.object3D.getWorldPosition(new THREE.Vector3());
-                const rightPos = rightEl.object3D.getWorldPosition(new THREE.Vector3());
-                
-                // Evitar gatillar chispas infinitas si están parados en la posición por defecto de inicio de página (0,0,0)
-                if (leftPos.length() > 0.1 && rightPos.length() > 0.1) {
-                    const dist = leftPos.distanceTo(rightPos);
-                    if (dist < 0.25) {
-                        const midPoint = {
-                            x: (leftPos.x + rightPos.x) / 2,
-                            y: (leftPos.y + rightPos.y) / 2,
-                            z: (leftPos.z + rightPos.z) / 2
-                        };
-                        for(let k=0; k<2; k++) createNativeSpark(midPoint);
-                    }
-                }
-            }
-
-            if (!gameActive) {
+            if (!gameActive || magicModeActive) {
                 requestAnimationFrame(gameLoop);
                 return;
             }
@@ -304,11 +368,12 @@
                 lastSpawnTime = now;
             }
 
+            // Detección de golpes usando Raycasters (VR/Móvil por igual)
             const leftRaycaster = document.getElementById('left-hand').components.raycaster;
             const rightRaycaster = document.getElementById('right-hand').components.raycaster;
+            const fallbackRaycaster = document.getElementById('mouse-fallback').components.raycaster;
             const headPos = document.getElementById('head').getAttribute('position');
 
-            // Renderizado de bloques
             for (let i = activeCubes.length - 1; i >= 0; i--) {
                 const cube = activeCubes[i];
                 if (!cube || !cube.parentNode) continue;
@@ -319,13 +384,10 @@
 
                 let hitLeft = leftRaycaster && leftRaycaster.intersectedEls.includes(cube);
                 let hitRight = rightRaycaster && rightRaycaster.intersectedEls.includes(cube);
+                let hitTouch = fallbackRaycaster && fallbackRaycaster.intersectedEls.includes(cube);
 
-                if (hitLeft || hitRight) {
-                    if ((hitLeft && cube.userData.isRed) || (hitRight && !cube.userData.isRed)) {
-                        score += 100;
-                    } else {
-                        score += 20;
-                    }
+                if (hitLeft || hitRight || hitTouch) {
+                    score += 100;
                     updateScore();
                     cube.parentNode.removeChild(cube);
                     activeCubes.splice(i, 1);
@@ -338,7 +400,7 @@
                 }
             }
 
-            // Renderizado de paredes
+            // Mover paredes
             for (let j = activeWalls.length - 1; j >= 0; j--) {
                 const wall = activeWalls[j];
                 if (!wall || !wall.parentNode) continue;
@@ -348,7 +410,7 @@
                 wall.setAttribute('position', pos);
 
                 if (Math.abs(pos.z - headPos.z) < 0.4 && Math.abs(pos.x - headPos.x) < 0.7) {
-                    score = Math.max(0, score - 3);
+                    score = Math.max(0, score - 2);
                     updateScore();
                 }
 
@@ -359,7 +421,7 @@
             }
 
             if (currentAudio && currentAudio.ended) {
-                stopGame();
+                returnToMenu();
             }
 
             requestAnimationFrame(gameLoop);
@@ -369,22 +431,40 @@
             document.getElementById('score-text').setAttribute('value', `SCORE: ${score}`);
         }
 
-        function stopGame() {
+        function updateNPCUI() {
+            document.getElementById('npc-hp-text').setAttribute('value', `HP: ${enemyHP}/${maxEnemyHP}`);
+        }
+
+        function hideMainMenu() {
+            const menu = document.getElementById('main-menu');
+            menu.setAttribute('visible', 'false');
+            menu.setAttribute('position', '0 -100 0');
+        }
+
+        function returnToMenu() {
             gameActive = false;
+            magicModeActive = false;
+            isDrawing = false;
             if (currentAudio) currentAudio.pause();
 
             document.getElementById('gameplay-container').innerHTML = '';
+            document.getElementById('drawn-lines-container').innerHTML = '';
             activeCubes = [];
             activeWalls = [];
-            document.getElementById('dreamcore-decor').setAttribute('visible', 'false');
 
+            // Regresar menú
             const menu = document.getElementById('main-menu');
             menu.setAttribute('visible', 'true');
-            menu.setAttribute('position', '0 1.6 -2');
-            document.getElementById('panel-levels').setAttribute('visible', 'true');
-            document.getElementById('panel-difficulty').setAttribute('visible', 'false');
+            menu.setAttribute('position', '0 1.6 -2.2');
             
+            document.getElementById('menu-blocks').setAttribute('visible', 'true');
+            document.getElementById('menu-blocks').setAttribute('position', '0 0 0');
+            document.getElementById('menu-magic').setAttribute('visible', 'false');
+            document.getElementById('menu-magic').setAttribute('position', '0 0 -50');
+            
+            document.getElementById('panel-difficulty').setAttribute('visible', 'false');
             document.getElementById('game-ui').setAttribute('visible', 'false');
+            document.getElementById('magic-mode-container').setAttribute('visible', 'false');
         }
 
         requestAnimationFrame(gameLoop);
