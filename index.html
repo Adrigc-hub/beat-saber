@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Beat Saber VR - Fixed Load</title>
+    <title>Beat Saber VR - Dreamcore & Fixed Sparks</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.3.2/dist/aframe-environment-component.min.js"></script>
 </head>
@@ -14,7 +14,7 @@
             <audio id="music-easy" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
             <audio id="music-normal" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" preload="auto"></audio>
             <audio id="music-hard" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" preload="auto"></audio>
-            <audio id="music-backrooms" src="https://actions.google.com/sounds/v1/ambiences/ambient_hum_air_conditioner.mp3" preload="auto"></audio>
+            <audio id="music-backrooms" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3" preload="auto"></audio>
             <audio id="music-shiver" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" preload="auto"></audio>
         </a-assets>
 
@@ -25,12 +25,18 @@
         <a-entity id="decorations" position="0 0 0">
             <a-torus class="moving-ring" color="#ff0055" radius="5" tube="0.08" position="0 2.5 -10" material="emissive: #ff0055; emissiveIntensity: 4"></a-torus>
             <a-torus class="moving-ring" color="#00ffff" radius="5" tube="0.08" position="0 2.5 -20" material="emissive: #00ffff; emissiveIntensity: 4"></a-torus>
-            <a-torus class="moving-ring" color="#ff0055" radius="5" tube="0.08" position="0 2.5 -30" material="emissive: #ff0055; emissiveIntensity: 4"></a-torus>
             
-            <a-box position="-6 5 -15" scale="0.8 12 0.8" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 3; roughness: 0.1"></a-box>
-            <a-box position="6 5 -15" scale="0.8 12 0.8" color="#ff0055" material="emissive: #ff0055; emissiveIntensity: 3; roughness: 0.1"></a-box>
-            <a-box position="-8 5 -25" scale="1 16 1" color="#ff0055" material="emissive: #ff0055; emissiveIntensity: 2"></a-box>
-            <a-box position="8 5 -25" scale="1 16 1" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 2"></a-box>
+            <a-box position="-6 5 -15" scale="0.8 12 0.8" color="#00ffff" material="emissive: #00ffff; emissiveIntensity: 3"></a-box>
+            <a-box position="6 5 -15" scale="0.8 12 0.8" color="#ff0055" material="emissive: #ff0055; emissiveIntensity: 3"></a-box>
+        </a-entity>
+
+        <a-entity id="dreamcore-decor" visible="false">
+            <a-sphere position="0 6 -25" radius="2" color="#fff" material="roughness: 0.1">
+                <a-sphere position="0 0 1.8" radius="0.6" color="#000"></a-sphere> </a-sphere>
+            <a-box position="-3 5 -20" scale="3 0.1 1" color="#ff00ff" rotation="0 0 30" material="emissive: #ff00ff"></a-box>
+            <a-box position="3 5 -20" scale="3 0.1 1" color="#ff00ff" rotation="0 0 -30" material="emissive: #ff00ff"></a-box>
+            <a-sphere position="-4 2 -12" radius="0.4" color="#fff"><a-sphere position="0 0 0.35" radius="0.12" color="#ff0000"></a-sphere></a-sphere>
+            <a-sphere position="4 3 -16" radius="0.4" color="#fff"><a-sphere position="0 0 0.35" radius="0.12" color="#ff0000"></a-sphere></a-sphere>
         </a-entity>
 
         <a-entity id="rig" position="0 0 0">
@@ -40,14 +46,12 @@
             
             <a-entity id="left-hand" laser-controls="hand: left" raycaster="objects: .cube, .wall; far: 1.6; interval: 30">
                 <a-cylinder color="#444" radius="0.025" height="0.25" position="0 0 0" rotation="90 0 0" material="metalness: 1; roughness: 0.2"></a-cylinder>
-                <a-cone color="#ff0000" radius-bottom="0.03" radius-top="0.01" height="0.05" position="0 0 -0.12" rotation="90 0 0"></a-cone>
-                <a-cylinder id="saber-blade-left" color="#ff0000" radius="0.018" height="1.2" position="0 0 -0.75" rotation="90 0 0" material="emissive: #ff0000; emissiveIntensity: 5; metalness: 0"></a-cylinder>
+                <a-cylinder id="saber-blade-left" color="#ff0000" radius="0.018" height="1.2" position="0 0 -0.75" rotation="90 0 0" material="emissive: #ff0000; emissiveIntensity: 5"></a-cylinder>
             </a-entity>
             
             <a-entity id="right-hand" laser-controls="hand: right" raycaster="objects: .menu-btn, .cube, .wall; far: 7; interval: 30">
                 <a-cylinder color="#444" radius="0.025" height="0.25" position="0 0 0" rotation="90 0 0" material="metalness: 1; roughness: 0.2"></a-cylinder>
-                <a-cone color="#0088ff" radius-bottom="0.03" radius-top="0.01" height="0.05" position="0 0 -0.12" rotation="90 0 0"></a-cone>
-                <a-cylinder id="saber-blade-right" color="#0088ff" radius="0.018" height="1.2" position="0 0 -0.75" rotation="90 0 0" material="emissive: #0088ff; emissiveIntensity: 5; metalness: 0"></a-cylinder>
+                <a-cylinder id="saber-blade-right" color="#0088ff" radius="0.018" height="1.2" position="0 0 -0.75" rotation="90 0 0" material="emissive: #0088ff; emissiveIntensity: 5"></a-cylinder>
                 <a-line start="0 0 0" end="0 0 -7" color="#0088ff" opacity="0.7"></a-line>
             </a-entity>
 
@@ -68,7 +72,7 @@
                 <a-entity class="menu-btn" data-sel-level="1" geometry="primitive: plane; width: 2.4; height: 0.2" material="color: #222" position="0 0.4 0.03" text="value: 1. Tutorial Chill; align: center; width: 3.5"></a-entity>
                 <a-entity class="menu-btn" data-sel-level="2" geometry="primitive: plane; width: 2.4; height: 0.2" material="color: #222" position="0 0.15 0.03" text="value: 2. Cyber Beats; align: center; width: 3.5"></a-entity>
                 <a-entity class="menu-btn" data-sel-level="3" geometry="primitive: plane; width: 2.4; height: 0.2" material="color: #222" position="0 -0.1 0.03" text="value: 3. Neon Rush; align: center; width: 3.5"></a-entity>
-                <a-entity class="menu-btn" data-sel-level="4" geometry="primitive: plane; width: 2.4; height: 0.2" material="color: #443300" position="0 -0.35 0.03" text="value: 4. LOST IN BACKROOMS; align: center; width: 3.5; color: #ffcc00"></a-entity>
+                <a-entity class="menu-btn" data-sel-level="4" geometry="primitive: plane; width: 2.4; height: 0.2" material="color: #443300" position="0 -0.35 0.03" text="value: 4. DREAMCORE BACKROOMS; align: center; width: 3.5; color: #ffcc00"></a-entity>
                 <a-entity class="menu-btn" data-sel-level="5" geometry="primitive: plane; width: 2.4; height: 0.2" material="color: #550022" position="0 -0.60 0.03" text="value: 5. SHIVER X (Extreme); align: center; width: 3.5; color: #ff0055"></a-entity>
             </a-entity>
 
@@ -81,7 +85,7 @@
                 <a-entity class="menu-btn" data-diff="2" geometry="primitive: plane; width: 1.1; height: 0.22" material="color: #222" position="-0.65 0.1 0.03" text="value: DIFICIL; align: center"></a-entity>
                 <a-entity class="menu-btn" data-diff="3" geometry="primitive: plane; width: 1.1; height: 0.22" material="color: #222" position="0.65 0.1 0.03" text="value: HARDER; align: center"></a-entity>
                 <a-entity class="menu-btn" data-diff="4" geometry="primitive: plane; width: 2.4; height: 0.22" material="color: #3b2300" position="0 -0.2 0.03" text="value: EASY DEMON; align: center; color: #ffaa00"></a-entity>
-                <a-entity class="menu-btn" data-diff="5" geometry="primitive: plane; width: 2.4; height: 0.22" material="color: #520000" position="0 -0.48 0.03" text="value: HARD DEMON; align: center; color: #ff3333"></a-entity>
+                <a-entity class="menu-btn" data-diff="5" geometry="primitive: plane; width: 2.4; height: 0.22" material="color: #520000" position="0 -0.48 0.03" text="value: HARD HARD DEMON; align: center; color: #ff3333"></a-entity>
                 <a-entity class="menu-btn" data-diff="6" geometry="primitive: plane; width: 2.4; height: 0.22" material="color: #800020" position="0 -0.76 0.03" text="value: EXTREME DEMON; align: center; color: #ff0055"></a-entity>
 
                 <a-entity id="btn-back" class="menu-btn" geometry="primitive: plane; width: 0.6; height: 0.15" material="color: #444" position="0 1.05 0.03" text="value: BACK; align: center; width: 3"></a-entity>
@@ -109,11 +113,11 @@
             1: { audio: 'music-easy', baseSpeed: 6, baseSpawnRate: 1600, env: 'night', color: '#00ffff' },
             2: { audio: 'music-normal', baseSpeed: 9, baseSpawnRate: 1300, env: 'goaland', color: '#00ff88' },
             3: { audio: 'music-hard', baseSpeed: 13, baseSpawnRate: 1000, env: 'tron', color: '#ff00ff' },
-            4: { audio: 'music-backrooms', baseSpeed: 16, baseSpawnRate: 700, env: 'dream', color: '#ffaa00' }, 
-            5: { audio: 'music-shiver', baseSpeed: 24, baseSpawnRate: 400, env: 'poison', color: '#ff0055' } 
+            4: { audio: 'music-backrooms', baseSpeed: 16, baseSpawnRate: 720, env: 'dream', color: '#ffcc00' }, 
+            5: { audio: 'music-shiver', baseSpeed: 25, baseSpawnRate: 380, env: 'poison', color: '#ff0055' } 
         };
 
-        // ENRUTAMIENTO DEL MENÚ INTERACTIVO
+        // MENU CONTROLS
         document.querySelectorAll('[data-sel-level]').forEach(btn => {
             btn.addEventListener('click', function() {
                 selectedLevelId = this.getAttribute('data-sel-level');
@@ -146,6 +150,13 @@
             document.getElementById('ambient-env').setAttribute('environment', `preset: ${currentLevelConfig.env}; lighting: none`);
             document.getElementById('neon-glow').setAttribute('light', `color: ${currentLevelConfig.color}; intensity: 2`);
 
+            // Activar decoración especial de Dreamcore si es el nivel 4
+            if(selectedLevelId == 4) {
+                document.getElementById('dreamcore-decor').setAttribute('visible', 'true');
+            } else {
+                document.getElementById('dreamcore-decor').setAttribute('visible', 'false');
+            }
+
             currentAudio = document.getElementById(currentLevelConfig.audio);
             currentAudio.currentTime = 0;
             currentAudio.play();
@@ -162,17 +173,15 @@
             lastSpawnTime = performance.now();
         }
 
-        // GENERACIÓN DE CUBOS DECORADOS CON FLECHAS TRIDIMENSIONALES
         function spawnCube() {
             const container = document.getElementById('gameplay-container');
             
-            if (Math.random() > 0.82) {
+            if (Math.random() > 0.85) {
                 spawnWall();
                 return;
             }
 
             const cube = document.createElement('a-entity');
-            
             const posX = (Math.random() * 1.6) - 0.8; 
             const posY = (Math.random() * 1.1) + 0.7; 
             const posZ = -35;
@@ -185,14 +194,13 @@
             cube.setAttribute('material', `color: ${cubeColor}; emissive: ${cubeColor}; emissiveIntensity: 2; roughness: 0.2`);
             cube.setAttribute('position', `${posX} ${posY} ${posZ}`);
 
-            // Flecha tridimensional corregida hacia el frente
+            // Flecha apuntando al frente
             const arrow = document.createElement('a-cone');
             arrow.setAttribute('geometry', 'radiusBottom: 0.08; radiusTop: 0; height: 0.18');
             arrow.setAttribute('material', 'color: #ffffff; emissive: #ffffff; emissiveIntensity: 3');
             
             const directions = [0, 90, 180, 270];
             const randomRot = directions[Math.floor(Math.random() * directions.length)];
-            // Rotamos en el plano correcto para que mire al jugador de frente
             arrow.setAttribute('rotation', `90 0 ${randomRot}`);
             arrow.setAttribute('position', '0 0 0.19'); 
 
@@ -206,7 +214,6 @@
         function spawnWall() {
             const container = document.getElementById('gameplay-container');
             const wall = document.createElement('a-box');
-
             const isLeft = Math.random() > 0.5;
             const posX = isLeft ? -0.9 : 0.9;
 
@@ -219,7 +226,6 @@
             activeWalls.push(wall);
         }
 
-        // SISTEMA PROPIO DE CHISPAS NATIVAS (Sin librerías propensas a romperse)
         function createNativeSpark(pos) {
             const container = document.getElementById('spark-container');
             const spark = document.createElement('a-sphere');
@@ -228,7 +234,6 @@
             spark.setAttribute('material', 'color: #bc00ff; emissive: #ff00ff; emissiveIntensity: 3');
             spark.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
             
-            // Vector de velocidad aleatorio para la explosión de chispas
             spark.userData = {
                 vx: (Math.random() - 0.5) * 3,
                 vy: (Math.random() * 2) + 1,
@@ -240,7 +245,6 @@
             liveSparks.push(spark);
         }
 
-        // TICK DE FÍSICAS FLUIDO POR DELTA TIME
         let lastFrameTime = performance.now();
 
         function gameLoop() {
@@ -248,14 +252,14 @@
             const deltaTime = (now - lastFrameTime) / 1000;
             lastFrameTime = now;
 
-            // Procesar comportamiento de chispas activas
+            // ANIMACIÓN DE LAS CHISPAS ACTIVAS
             for (let s = liveSparks.length - 1; s >= 0; s--) {
                 const spark = liveSparks[s];
                 let sPos = spark.getAttribute('position');
                 let uData = spark.userData;
                 
                 uData.age += deltaTime;
-                if (uData.age > 0.4) { // Ciclo de vida corto
+                if (uData.age > 0.35) {
                     spark.parentNode.removeChild(spark);
                     liveSparks.splice(s, 1);
                     continue;
@@ -264,28 +268,28 @@
                 sPos.x += uData.vx * deltaTime;
                 sPos.y += uData.vy * deltaTime;
                 sPos.z += uData.vz * deltaTime;
-                uData.vy -= 9.8 * deltaTime; // Gravedad simulada
+                uData.vy -= 9.8 * deltaTime; 
                 spark.setAttribute('position', sPos);
             }
 
-            // Detección de contacto de sables
+            // CONTROL FIX DE CRASH DE CHISPAS: Solo verificar colisión si el visor/mandos están activos en espacio real
             const leftEl = document.getElementById('saber-blade-left');
             const rightEl = document.getElementById('saber-blade-right');
             
             if (leftEl && rightEl && leftEl.object3D && rightEl.object3D) {
                 const leftPos = leftEl.object3D.getWorldPosition(new THREE.Vector3());
                 const rightPos = rightEl.object3D.getWorldPosition(new THREE.Vector3());
-                const dist = leftPos.distanceTo(rightPos);
-
-                if (dist < 0.3) {
-                    const midPoint = {
-                        x: (leftPos.x + rightPos.x) / 2,
-                        y: (leftPos.y + rightPos.y) / 2,
-                        z: (leftPos.z + rightPos.z) / 2
-                    };
-                    // Generar ráfagas de chispas moradas mientras colisionen
-                    for(let k=0; k<2; k++) {
-                        createNativeSpark(midPoint);
+                
+                // Evitar gatillar chispas infinitas si están parados en la posición por defecto de inicio de página (0,0,0)
+                if (leftPos.length() > 0.1 && rightPos.length() > 0.1) {
+                    const dist = leftPos.distanceTo(rightPos);
+                    if (dist < 0.25) {
+                        const midPoint = {
+                            x: (leftPos.x + rightPos.x) / 2,
+                            y: (leftPos.y + rightPos.y) / 2,
+                            z: (leftPos.z + rightPos.z) / 2
+                        };
+                        for(let k=0; k<2; k++) createNativeSpark(midPoint);
                     }
                 }
             }
@@ -304,7 +308,7 @@
             const rightRaycaster = document.getElementById('right-hand').components.raycaster;
             const headPos = document.getElementById('head').getAttribute('position');
 
-            // Actualizar bloques
+            // Renderizado de bloques
             for (let i = activeCubes.length - 1; i >= 0; i--) {
                 const cube = activeCubes[i];
                 if (!cube || !cube.parentNode) continue;
@@ -334,7 +338,7 @@
                 }
             }
 
-            // Actualizar paredes
+            // Renderizado de paredes
             for (let j = activeWalls.length - 1; j >= 0; j--) {
                 const wall = activeWalls[j];
                 if (!wall || !wall.parentNode) continue;
@@ -344,7 +348,7 @@
                 wall.setAttribute('position', pos);
 
                 if (Math.abs(pos.z - headPos.z) < 0.4 && Math.abs(pos.x - headPos.x) < 0.7) {
-                    score = Math.max(0, score - 5);
+                    score = Math.max(0, score - 3);
                     updateScore();
                 }
 
@@ -372,6 +376,7 @@
             document.getElementById('gameplay-container').innerHTML = '';
             activeCubes = [];
             activeWalls = [];
+            document.getElementById('dreamcore-decor').setAttribute('visible', 'false');
 
             const menu = document.getElementById('main-menu');
             menu.setAttribute('visible', 'true');
