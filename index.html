@@ -2,10 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Beat Saber VR - Full Ultimate Edition</title>
+    <title>Beat Saber VR - Fixed Load</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.3.2/dist/aframe-environment-component.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-particle-system-component@master/dist/aframe-particle-system-component.min.js"></script>
 </head>
 <body>
 
@@ -52,18 +51,18 @@
                 <a-line start="0 0 0" end="0 0 -7" color="#0088ff" opacity="0.7"></a-line>
             </a-entity>
 
-            <a-entity id="spark-particles" position="0 1.2 -0.5" particle-system="color: #bc00ff,#7000ff; particleCount: 80; size: 0.15; maxAge: 0.4; velocityValue: 0 2 0; distribution: sphere" visible="false"></a-entity>
+            <a-entity id="spark-container"></a-entity>
         </a-entity>
 
         <a-entity id="gameplay-container"></a-entity>
 
         <a-entity id="game-ui" position="0 3.5 -3.5" visible="false">
-            <a-text id="score-text" value="SCORE: 0" align="center" color="#fff" width="6" font="monoid"></a-text>
+            <a-text id="score-text" value="SCORE: 0" align="center" color="#fff" width="6"></a-text>
         </a-entity>
 
         <a-entity id="main-menu" position="0 1.6 -2">
             <a-entity id="panel-levels" visible="true">
-                <a-plane color="#0a0a0a" width="2.8" height="2.2" opacity="0.95" material="roughness: 0.5"></a-plane>
+                <a-plane color="#0a0a0a" width="2.8" height="2.2" opacity="0.95"></a-plane>
                 <a-text value="SELECT SONG" align="center" position="0 0.8 0.03" width="6" color="#00ffff"></a-text>
                 
                 <a-entity class="menu-btn" data-sel-level="1" geometry="primitive: plane; width: 2.4; height: 0.2" material="color: #222" position="0 0.4 0.03" text="value: 1. Tutorial Chill; align: center; width: 3.5"></a-entity>
@@ -93,7 +92,7 @@
 
     <script>
         const dificultades = ["FACIL", "MEDIO", "DIFICIL", "HARDER", "EASY DEMON", "HARD DEMON", "EXTREME DEMON"];
-        const diffMultipliers = [0.6, 1.0, 1.4, 1.8, 2.3, 2.9, 4.0]; // Multiplicadores de velocidad insanos para Demon
+        const diffMultipliers = [0.6, 1.0, 1.4, 1.8, 2.3, 2.9, 4.0];
 
         let selectedLevelId = 1;
         let selectedDiffIdx = 1;
@@ -103,6 +102,7 @@
         let currentAudio = null;
         let activeCubes = [];
         let activeWalls = [];
+        let liveSparks = [];
         let currentLevelConfig = {};
 
         const levelsData = {
@@ -138,7 +138,6 @@
         function startLevel() {
             currentLevelConfig = levelsData[selectedLevelId];
             
-            // Apagar y esconder menú completo
             const menu = document.getElementById('main-menu');
             menu.setAttribute('visible', 'false');
             menu.setAttribute('position', '0 -100 0');
@@ -147,12 +146,10 @@
             document.getElementById('ambient-env').setAttribute('environment', `preset: ${currentLevelConfig.env}; lighting: none`);
             document.getElementById('neon-glow').setAttribute('light', `color: ${currentLevelConfig.color}; intensity: 2`);
 
-            // Play música
             currentAudio = document.getElementById(currentLevelConfig.audio);
             currentAudio.currentTime = 0;
             currentAudio.play();
 
-            // Configurar métricas finales según la dificultad del submenú
             const mult = diffMultipliers[selectedDiffIdx];
             currentLevelConfig.finalSpeed = currentLevelConfig.baseSpeed * mult;
             currentLevelConfig.finalSpawnRate = currentLevelConfig.baseSpawnRate / (mult * 0.85);
@@ -169,7 +166,6 @@
         function spawnCube() {
             const container = document.getElementById('gameplay-container');
             
-            // De forma aleatoria, decidir si mandamos una Pared de Obstáculo en lugar de un cubo
             if (Math.random() > 0.82) {
                 spawnWall();
                 return;
@@ -184,22 +180,21 @@
             const isRed = Math.random() > 0.5;
             const cubeColor = isRed ? '#ff0000' : '#0088ff';
 
-            // Cuerpo del Cubo (Base)
             cube.setAttribute('class', 'cube');
             cube.setAttribute('geometry', 'primitive: box; width: 0.36; height: 0.36; depth: 0.36');
             cube.setAttribute('material', `color: ${cubeColor}; emissive: ${cubeColor}; emissiveIntensity: 2; roughness: 0.2`);
             cube.setAttribute('position', `${posX} ${posY} ${posZ}`);
 
-            // Decoración Interna: Flecha Directiva Tridimensional (Blanca brillante)
+            // Flecha tridimensional corregida hacia el frente
             const arrow = document.createElement('a-cone');
             arrow.setAttribute('geometry', 'radiusBottom: 0.08; radiusTop: 0; height: 0.18');
             arrow.setAttribute('material', 'color: #ffffff; emissive: #ffffff; emissiveIntensity: 3');
             
-            // Dirección aleatoria de la flecha (Rotación en Z)
             const directions = [0, 90, 180, 270];
             const randomRot = directions[Math.floor(Math.random() * directions.length)];
-            arrow.setAttribute('rotation', `0 0 ${randomRot}`);
-            arrow.setAttribute('position', '0 0 -0.19'); // Al frente del bloque
+            // Rotamos en el plano correcto para que mire al jugador de frente
+            arrow.setAttribute('rotation', `90 0 ${randomRot}`);
+            arrow.setAttribute('position', '0 0 0.19'); 
 
             cube.appendChild(arrow);
             container.appendChild(cube);
@@ -208,26 +203,44 @@
             activeCubes.push(cube);
         }
 
-        // GENERACIÓN DE PAREDES DE ESQUIVE
         function spawnWall() {
             const container = document.getElementById('gameplay-container');
             const wall = document.createElement('a-box');
 
-            // Posición izquierda o derecha del mapa ocupando gran volumen
             const isLeft = Math.random() > 0.5;
             const posX = isLeft ? -0.9 : 0.9;
 
             wall.setAttribute('class', 'wall');
             wall.setAttribute('position', `${posX} 2 -35`);
-            wall.setAttribute('scale', '1.2 3.5 0.5'); // Altas y anchas
-            // Paredes translúcidas rojas futuristas
+            wall.setAttribute('scale', '1.2 3.5 0.5'); 
             wall.setAttribute('material', 'color: #ff0022; opacity: 0.6; transparent: true; emissive: #ff0022; emissiveIntensity: 1.5');
 
             container.appendChild(wall);
             activeWalls.push(wall);
         }
 
-        // TICK DE FÍSICAS CORREGIDO INDEPENDIENTE POR DELTA TIME
+        // SISTEMA PROPIO DE CHISPAS NATIVAS (Sin librerías propensas a romperse)
+        function createNativeSpark(pos) {
+            const container = document.getElementById('spark-container');
+            const spark = document.createElement('a-sphere');
+            
+            spark.setAttribute('radius', '0.015');
+            spark.setAttribute('material', 'color: #bc00ff; emissive: #ff00ff; emissiveIntensity: 3');
+            spark.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
+            
+            // Vector de velocidad aleatorio para la explosión de chispas
+            spark.userData = {
+                vx: (Math.random() - 0.5) * 3,
+                vy: (Math.random() * 2) + 1,
+                vz: (Math.random() - 0.5) * 3,
+                age: 0
+            };
+            
+            container.appendChild(spark);
+            liveSparks.push(spark);
+        }
+
+        // TICK DE FÍSICAS FLUIDO POR DELTA TIME
         let lastFrameTime = performance.now();
 
         function gameLoop() {
@@ -235,18 +248,46 @@
             const deltaTime = (now - lastFrameTime) / 1000;
             lastFrameTime = now;
 
-            // EFECTO DE CHISPAS: Comprobación de cruce de sables (Si están muy cerca en el espacio 3D)
-            const leftPos = document.getElementById('saber-blade-left').object3D.getWorldPosition(new THREE.Vector3());
-            const rightPos = document.getElementById('saber-blade-right').object3D.getWorldPosition(new THREE.Vector3());
-            const dist = leftPos.distanceTo(rightPos);
+            // Procesar comportamiento de chispas activas
+            for (let s = liveSparks.length - 1; s >= 0; s--) {
+                const spark = liveSparks[s];
+                let sPos = spark.getAttribute('position');
+                let uData = spark.userData;
+                
+                uData.age += deltaTime;
+                if (uData.age > 0.4) { // Ciclo de vida corto
+                    spark.parentNode.removeChild(spark);
+                    liveSparks.splice(s, 1);
+                    continue;
+                }
+                
+                sPos.x += uData.vx * deltaTime;
+                sPos.y += uData.vy * deltaTime;
+                sPos.z += uData.vz * deltaTime;
+                uData.vy -= 9.8 * deltaTime; // Gravedad simulada
+                spark.setAttribute('position', sPos);
+            }
 
-            const sparks = document.getElementById('spark-particles');
-            if (dist < 0.28) { // Si las hojas de los sables se intersectan
-                sparks.setAttribute('visible', 'true');
-                // Posicionar las chispas justo en medio de los dos sables
-                sparks.setAttribute('position', `${(leftPos.x + rightPos.x)/2} ${(leftPos.y + rightPos.y)/2} ${(leftPos.z + rightPos.z)/2}`);
-            } else {
-                sparks.setAttribute('visible', 'false');
+            // Detección de contacto de sables
+            const leftEl = document.getElementById('saber-blade-left');
+            const rightEl = document.getElementById('saber-blade-right');
+            
+            if (leftEl && rightEl && leftEl.object3D && rightEl.object3D) {
+                const leftPos = leftEl.object3D.getWorldPosition(new THREE.Vector3());
+                const rightPos = rightEl.object3D.getWorldPosition(new THREE.Vector3());
+                const dist = leftPos.distanceTo(rightPos);
+
+                if (dist < 0.3) {
+                    const midPoint = {
+                        x: (leftPos.x + rightPos.x) / 2,
+                        y: (leftPos.y + rightPos.y) / 2,
+                        z: (leftPos.z + rightPos.z) / 2
+                    };
+                    // Generar ráfagas de chispas moradas mientras colisionen
+                    for(let k=0; k<2; k++) {
+                        createNativeSpark(midPoint);
+                    }
+                }
             }
 
             if (!gameActive) {
@@ -254,7 +295,6 @@
                 return;
             }
 
-            // Spawn Control temporal
             if (now - lastSpawnTime > currentLevelConfig.finalSpawnRate) {
                 spawnCube();
                 lastSpawnTime = now;
@@ -264,7 +304,7 @@
             const rightRaycaster = document.getElementById('right-hand').components.raycaster;
             const headPos = document.getElementById('head').getAttribute('position');
 
-            // Mover y verificar colisiones de los bloques con Flechas
+            // Actualizar bloques
             for (let i = activeCubes.length - 1; i >= 0; i--) {
                 const cube = activeCubes[i];
                 if (!cube || !cube.parentNode) continue;
@@ -280,7 +320,7 @@
                     if ((hitLeft && cube.userData.isRed) || (hitRight && !cube.userData.isRed)) {
                         score += 100;
                     } else {
-                        score += 20; // Castigo por usar mano incorrecta
+                        score += 20;
                     }
                     updateScore();
                     cube.parentNode.removeChild(cube);
@@ -294,7 +334,7 @@
                 }
             }
 
-            // Mover y verificar colisiones de las PAREDES contra el jugador
+            // Actualizar paredes
             for (let j = activeWalls.length - 1; j >= 0; j--) {
                 const wall = activeWalls[j];
                 if (!wall || !wall.parentNode) continue;
@@ -303,9 +343,8 @@
                 pos.z += currentLevelConfig.finalSpeed * deltaTime;
                 wall.setAttribute('position', pos);
 
-                // Colisión simple: si la pared ocupa el mismo espacio Z y X que la cabeza del jugador
                 if (Math.abs(pos.z - headPos.z) < 0.4 && Math.abs(pos.x - headPos.x) < 0.7) {
-                    score = Math.max(0, score - 5); // Pierdes puntos continuamente si te atraviesa la pared
+                    score = Math.max(0, score - 5);
                     updateScore();
                 }
 
@@ -315,7 +354,6 @@
                 }
             }
 
-            // Terminar si el audio acaba
             if (currentAudio && currentAudio.ended) {
                 stopGame();
             }
@@ -335,7 +373,6 @@
             activeCubes = [];
             activeWalls = [];
 
-            // Resetear Menús
             const menu = document.getElementById('main-menu');
             menu.setAttribute('visible', 'true');
             menu.setAttribute('position', '0 1.6 -2');
