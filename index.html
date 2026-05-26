@@ -2,75 +2,266 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Beat Saber VR - Código Limpio</title>
+    <title>VR Beat Rhythm Game</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.3.2/dist/aframe-environment-component.min.js"></script>
 </head>
 <body>
 
-    <a-scene id="game-scene">
-        <a-light type="ambient" color="#666"></a-light>
-        <a-light type="directional" color="#fff" intensity="1" position="-1 4 2"></a-light>
+    <a-scene xr-mode-ui="enabled: true">
+        
+        <a-assets>
+            <audio id="music-backrooms" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+            <audio id="music-shiver" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" preload="auto"></audio>
+            <audio id="music-level3" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" preload="auto"></audio>
+            <audio id="music-level4" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" preload="auto"></audio>
+            <audio id="music-level5" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3" preload="auto"></audio>
+        </a-assets>
 
-        <a-entity id="env" environment="preset: starry; skyType: gradient; skyColor: #020205; horizonColor: #050510; grid: cross; gridColor: #111a2e"></a-entity>
+        <a-entity id="ambient-env" environment="preset: night; lighting: none; shadow: false; playArea: 1"></a-entity>
+        <a-entity light="type: ambient; color: #333"></a-entity>
+        <a-entity id="stage-light" light="type: directional; color: #ff0055; intensity: 0.5" position="0 5 3"></a-entity>
 
-        <a-entity id="decor-shiver" visible="false">
-            <a-sphere id="shiver-moon" position="0 20 -60" radius="18" color="#ff0055" material="shader: flat; fog: false"></a-sphere>
-            <a-entity id="boss-mesh" position="0 5 -25">
-                <a-octahedron scale="3 5 3" color="#ff0055" material="wireframe: true; wireframeLineWidth: 5"></a-octahedron>
-            </a-entity>
-        </a-entity>
-
-        <a-entity id="decor-something" visible="false">
-            <a-sky id="backroom-sky" color="#111405"></a-sky>
-            <a-box id="backroom-wall-l" position="-7 4 -20" scale="0.5 14 60" color="#dddd88" material="shader: flat"></a-box>
-            <a-box id="backroom-wall-r" position="7 4 -20" scale="0.5 14 60" color="#dddd88" material="shader: flat"></a-box>
-            <a-box id="backroom-roof" position="0 11 -20" scale="15 0.5 60" color="#ffffee" material="shader: flat"></a-box>
+        <a-entity id="rig" position="0 0 0">
+            <a-camera position="0 1.6 0">
+                <a-cursor id="fuse-cursor" color="#fff" depth="0.05" position="0 0 -1" visible="false"></a-cursor>
+            </a-camera>
             
-            <a-box id="backroom-p1" position="-3.5 4 -15" scale="1.8 8 1.8" color="#ffeb3b" material="shader: flat"></a-box>
-            <a-box id="backroom-p2" position="3.5 4 -25" scale="1.8 8 1.8" color="#ffeb3b" material="shader: flat"></a-box>
-        </a-entity>
-
-        <a-entity id="neon-rails" position="0 0 -20">
-            <a-box position="-2 0.05 0" scale="0.15 0.15 40" color="#ff0055" material="shader: flat"></a-box>
-            <a-box position="2 0.05 0" scale="0.15 0.15 40" color="#00ffff" material="shader: flat"></a-box>
-        </a-entity>
-
-        <a-entity id="rig">
-            <a-entity camera position="0 1.6 0" look-controls></a-entity>
+            <a-entity id="left-saber" laser-controls="hand: left" raycaster="objects: .cube; far: 1.2; showLine: false">
+                <a-cylinder color="#ff0000" radius="0.02" height="1.2" position="0 0 -0.6" rotation="90 0 0" material="emissive: #ff0000; emissiveIntensity: 2"></a-cylinder>
+            </a-entity>
             
-            <a-entity id="leftHand" oculus-touch-controls="hand: left" laser-controls="hand: left" raycaster="objects: .menu-btn; far: 8">
-                <a-entity id="saber-l" visible="false">
-                    <a-cylinder rotation="90 0 0" radius="0.03" height="0.15" color="#333"></a-cylinder>
-                    <a-cylinder position="0 0 -0.6" radius="0.02" height="1.2" rotation="90 0 0" color="#ff0055" material="shader: flat"></a-cylinder>
-                </a-entity>
-            </a-entity>
-
-            <a-entity id="rightHand" oculus-touch-controls="hand: right" laser-controls="hand: right" raycaster="objects: .menu-btn; far: 8">
-                <a-entity id="saber-r" visible="false">
-                    <a-cylinder rotation="90 0 0" radius="0.03" height="0.15" color="#333"></a-cylinder>
-                    <a-cylinder position="0 0 -0.6" radius="0.02" height="1.2" rotation="90 0 0" color="#00ffff" material="shader: flat"></a-cylinder>
-                </a-entity>
+            <a-entity id="right-saber" laser-controls="hand: right" raycaster="objects: .menu-btn, .cube; far: 5; interval: 100">
+                <a-cylinder color="#0088ff" radius="0.02" height="1.2" position="0 0 -0.6" rotation="90 0 0" material="emissive: #0088ff; emissiveIntensity: 2"></a-cylinder>
+                <a-line start="0 0 0" end="0 0 -5" color="#0088ff" opacity="0.7"></a-line>
             </a-entity>
         </a-entity>
 
-        <a-entity id="note-container"></a-entity>
+        <a-entity id="gameplay-container" position="0 0 0"></a-entity>
 
-        <a-entity id="main-menu" position="0 1.6 -2.2">
-            <a-plane width="2.5" height="1.5" color="#070a14" opacity="0.95">
-                <a-text value="BEAT SABER VR CUSTOM" align="center" color="#00ffff" position="0 0.5 0.05" scale="0.5 0.5 0.5"></a-text>
-                
-                <a-plane id="btn-lvl1" width="2" height="0.3" position="0 0.05 0.05" color="#1e293b" class="menu-btn">
-                    <a-text value="1. SHIVER (Geometry Dash)" align="center" color="#fff" position="0 0 0.02" scale="0.35 0.35 0.35"></a-text>
-                </a-plane>
-
-                <a-plane id="btn-lvl2" width="2" height="0.3" position="0 -0.4 0.05" color="#1e293b" class="menu-btn">
-                    <a-text value="2. I FOUND SOMETHING" align="center" color="#fff" position="0 0 0.02" scale="0.35 0.35 0.35"></a-text>
-                </a-plane>
-            </a-plane>
+        <a-entity id="game-ui" position="0 2.5 -2" visible="false">
+            <a-text id="score-text" value="SCORE: 0" align="center" color="#fff" width="4"></a-text>
         </a-entity>
+
+        <a-entity id="main-menu" position="0 1.6 -2.5">
+            <a-plane color="#111" width="3.2" height="2.2" opacity="0.9" position="0 0 0"></a-plane>
+            <a-text value="BEAT SABER VR" align="center" position="0 0.8 0.01" width="6" color="#ff0055"></a-text>
+
+            <a-entity position="0 0.4 0.01">
+                <a-text value="Dificultad:" align="center" position="-0.8 0 0" width="3"></a-text>
+                <a-entity id="btn-diff" class="menu-btn" geometry="primitive: plane; width: 1.2; height: 0.25" material="color: #333" position="0.3 0 0" text="value: NORMAL; align: center; width: 3.5"></a-entity>
+            </a-entity>
+
+            <a-entity position="0 -0.3 0.01">
+                <a-entity class="menu-btn" data-level="1" geometry="primitive: plane; width: 2.5; height: 0.2" material="color: #222" position="0 0.4 0" text="value: 1. Tutorial Chill (Facil); align: center; width: 3"></a-entity>
+                <a-entity class="menu-btn" data-level="2" geometry="primitive: plane; width: 2.5; height: 0.2" material="color: #222" position="0 0.15 0" text="value: 2. Cyber Beats (Medio); align: center; width: 3"></a-entity>
+                <a-entity class="menu-btn" data-level="3" geometry="primitive: plane; width: 2.5; height: 0.2" material="color: #222" position="0 -0.1 0" text="value: 3. Neon Rush (Dificil); align: center; width: 3"></a-entity>
+                <a-entity class="menu-btn" data-level="4" geometry="primitive: plane; width: 2.5; height: 0.2" material="color: #554400" position="0 -0.35 0" text="value: 4. LOST IN BACKROOMS (Harder); align: center; width: 3; color: #fff"></a-entity>
+                <a-entity class="menu-btn" data-level="5" geometry="primitive: plane; width: 2.5; height: 0.2" material="color: #ff0055" position="0 -0.60 0" text="value: 5. SHIVER X (EXTREME DEMON); align: center; width: 3; color: #fff"></a-entity>
+            </a-entity>
+        </a-entity>
+
+        <a-entity id="decorations" position="0 0 0" visible="false">
+            <a-box class="decor-light" position="-4 3 -10" scale="1 6 1" material="color: #ff0055; emissive: #ff0055; emissiveIntensity: 1"></a-box>
+            <a-box class="decor-light" position="4 3 -10" scale="1 6 1" material="color: #0088ff; emissive: #0088ff; emissiveIntensity: 1"></a-box>
+            <a-torus class="decor-ring" position="0 4 -15" radius="5" tube="0.1" material="color: #333; emissive: #333" rotation="0 0 0"></a-torus>
+        </a-entity>
+
     </a-scene>
 
-    <script src="game.js"></script>
+    <script>
+        // Configuración y variables de estado
+        const dificultades = ["FACIL", "MEDIO", "DIFICIL", "HARDER", "EASY DEMON", "HARD DEMON", "EXTREME DEMON"];
+        let diffIdx = 1; // Empieza por defecto en NORMAL (Medio)
+        let score = 0;
+        let gameActive = false;
+        let spawnInterval;
+        let currentAudio = null;
+        let activeCubes = [];
+
+        // Configuración de las canciones asignadas
+        const levelsData = {
+            1: { audio: 'music-level3', speed: 0.1, spawnRate: 1500, env: 'night' },
+            2: { audio: 'music-level4', speed: 0.13, spawnRate: 1200, env: 'goaland' },
+            3: { audio: 'music-level5', speed: 0.16, spawnRate: 1000, env: ' Tron ' },
+            4: { audio: 'music-backrooms', speed: 0.18, spawnRate: 800, env: 'starry', decorColor: '#ffaa00' }, // Backrooms Edit style
+            5: { audio: 'music-shiver', speed: 0.25, spawnRate: 400, env: 'poison', decorColor: '#ff0055' }    // Shiver Extreme Demon!
+        };
+
+        // Cambiar dificultad en el menú
+        document.getElementById('btn-diff').addEventListener('click', function() {
+            diffIdx = (diffIdx + 1) % dificultades.length;
+            this.setAttribute('text', `value: ${dificultades[diffIdx]}; align: center; width: 3.5`);
+        });
+
+        // Detectar clicks en los niveles del menú
+        const menuButtons = document.querySelectorAll('[data-level]');
+        menuButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const levelId = this.getAttribute('data-level');
+                startLevel(levelId);
+            });
+        });
+
+        // Iniciar el nivel seleccionado
+        function startLevel(id) {
+            const level = levelsData[id];
+            
+            // Ocultar menú y activar UI de gameplay
+            document.getElementById('main-menu').setAttribute('visible', 'false');
+            document.getElementById('main-menu').setAttribute('position', '0 -10 0'); // Lo alejamos para evitar clicks fantasmas
+            document.getElementById('game-ui').setAttribute('visible', 'true');
+            
+            // Configurar entorno visual según el nivel
+            document.getElementById('ambient-env').setAttribute('environment', `preset: ${level.env}; lighting: none`);
+            
+            // Activar y pintar decoraciones especiales si son los niveles difíciles (4 y 5)
+            const decor = document.getElementById('decorations');
+            if (id >= 4) {
+                decor.setAttribute('visible', 'true');
+                document.querySelectorAll('.decor-light').forEach(el => {
+                    el.setAttribute('material', `color: ${level.decorColor}; emissive: ${level.decorColor}; emissiveIntensity: 2`);
+                });
+            } else {
+                decor.setAttribute('visible', 'false');
+            }
+
+            // Reproducir Audio
+            currentAudio = document.getElementById(level.audio);
+            currentAudio.currentTime = 0;
+            currentAudio.play();
+
+            // Inicializar juego
+            score = 0;
+            updateScore();
+            gameActive = true;
+
+            // Multiplicador de velocidad extra según la dificultad elegida en el menú
+            const difficultyMultiplier = 1 + (diffIdx * 0.15);
+            const finalSpeed = level.speed * difficultyMultiplier;
+            const finalSpawnRate = level.spawnRate / difficultyMultiplier;
+
+            // Bucle de generación de cubos
+            spawnInterval = setInterval(() => {
+                spawnCube(finalSpeed, id);
+            }, finalSpawnRate);
+        }
+
+        // Crear cubos rítmicos en el espacio 3D
+        function spawnCube(speed, levelId) {
+            if (!gameActive) return;
+
+            const container = document.getElementById('gameplay-container');
+            const cube = document.createElement('a-box');
+
+            // Posiciones aleatorias en un grid frente al jugador (estilo Beat Saber)
+            const posX = (Math.random() * 1.6) - 0.8; // Izquierda a derecha
+            const posY = (Math.random() * 1.2) + 0.8; // Altura cómoda para los brazos
+            const posZ = -25; // Aparecen al fondo del pasillo
+
+            // Color del cubo (Rojo o Azul)
+            const isRed = Math.random() > 0.5;
+            const color = isRed ? '#ff0000' : '#0088ff';
+
+            cube.setAttribute('class', 'cube');
+            cube.setAttribute('position', `${posX} ${posY} ${posZ}`);
+            cube.setAttribute('scale', '0.4 0.4 0.4');
+            cube.setAttribute('material', `color: ${color}; emissive: ${color}; emissiveIntensity: 1.5; roughness: 0.2`);
+            
+            // Guardamos metadatos en el elemento para la física manual
+            cube.userData = {
+                speed: speed,
+                isRed: isRed
+            };
+
+            container.appendChild(cube);
+            activeCubes.push(cube);
+        }
+
+        // Bucle de física por frame (Tick manual para mover las notas hacia el jugador)
+        function gameTick() {
+            if (!gameActive) {
+                requestAnimationFrame(gameTick);
+                return;
+            }
+
+            const leftRaycaster = document.getElementById('left-saber').components.raycaster;
+            const rightRaycaster = document.getElementById('right-saber').components.raycaster;
+
+            // Animación de decoración en niveles difíciles (Rotación de anillos de fondo)
+            const ring = document.querySelector('.decor-ring');
+            if (ring) {
+                const currentRot = ring.getAttribute('rotation');
+                ring.setAttribute('rotation', `0 0 ${currentRot.z + 0.5}`);
+            }
+
+            for (let i = activeCubes.length - 1; i >= 0; i--) {
+                const cube = activeCubes[i];
+                if (!cube) continue;
+
+                let pos = cube.getAttribute('position');
+                
+                // Mover cubo hacia el jugador en el eje Z
+                pos.z += cube.userData.speed;
+                cube.setAttribute('position', pos);
+
+                // COMPROBAR INTERSECCIÓN / COLISIÓN CON LOS SABRES
+                // Usamos el sistema de Raycasting de los mandos para verificar cortes a corta distancia
+                let hitLeft = leftRaycaster && leftRaycaster.intersectedEls.includes(cube);
+                let hitRight = rightRaycaster && rightRaycaster.intersectedEls.includes(cube);
+
+                if (hitLeft || hitRight) {
+                    // Validar color correcto (Sable Izquierdo = Rojo, Derecho = Azul)
+                    if ((hitLeft && cube.userData.isRed) || (hitRight && !cube.userData.isRed)) {
+                        score += 100; // ¡Buen corte!
+                    } else {
+                        score += 20;  // Corte con sable equivocado da menos puntos
+                    }
+                    
+                    updateScore();
+                    cube.parentNode.removeChild(cube);
+                    activeCubes.splice(i, 1);
+                    continue;
+                }
+
+                // Si el cubo pasa detrás del jugador, se elimina
+                if (pos.z > 2) {
+                    cube.parentNode.removeChild(cube);
+                    activeCubes.splice(i, 1);
+                    
+                    // Verificar si la canción terminó para volver al menú
+                    if (currentAudio && currentAudio.ended) {
+                        endLevel();
+                    }
+                }
+            }
+
+            requestAnimationFrame(gameTick);
+        }
+
+        function updateScore() {
+            document.getElementById('score-text').setAttribute('value', `SCORE: ${score}`);
+        }
+
+        // Finalizar nivel y limpiar pantalla
+        function endLevel() {
+            gameActive = false;
+            clearInterval(spawnInterval);
+            if (currentAudio) currentAudio.pause();
+
+            // Limpiar cubos restantes
+            const container = document.getElementById('gameplay-container');
+            container.innerHTML = '';
+            activeCubes = [];
+
+            // Restaurar Menú Principal
+            document.getElementById('main-menu').setAttribute('visible', 'true');
+            document.getElementById('main-menu').setAttribute('position', '0 1.6 -2.5');
+            document.getElementById('game-ui').setAttribute('visible', 'false');
+        }
+
+        // Iniciar el bucle de renderizado/física
+        requestAnimationFrame(gameTick);
+    </script>
 </body>
 </html>
